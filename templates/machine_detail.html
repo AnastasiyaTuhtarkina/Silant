@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+        {% if user.is_authenticated %}
+            {% if is_manager or machine.client == user or machine.service_organization == user %}
+                <h1>{{ machine.serial_number }}</h1>
+                <p>Клиент: {{ machine.client.username }}</p>
+                <p>Сервисная организация: {{ machine.service_organization.username }}</p>
+            {% else %}
+                <p>У вас нет доступа к этой машине.</p>
+            {% endif %}
+        {% else %}
+            <p>Пожалуйста, авторизуйтесь для доступа к данным.</p>
+        {% endif %}
+        
+        <script src="" async defer></script>
+    </body>
+</html>

@@ -1,0 +1,160 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<h1> {% if user.groups.filter(name='Клиенты').exists %}
+    Клиент
+{% elif user.groups.filter(name='Сервисные компании').exists %}
+    Сервисная компания
+</h1>
+    <p>Информация о комплектации и технических характеристиках Вашей техники</p>
+    <div>
+        <button class="tab-button active" onclick="openTab(event, 'tab1')">Общая инфо</button>
+        <button class="tab-button" onclick="openTab(event, 'tab2')">ТО</button>
+        <button class="tab-button" onclick="openTab(event, 'tab3')">Рекламация</button>
+    </div>
+    
+    <div id="tab1" class="tab tab-content" style="display: block;">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>№ п/п</th>
+                    <th>Модель техники</th>
+                    <th>Зав.№ машины</th>
+                    <th>Модель двигателя</th>
+                    <th>Зав.№ двигателя</th>
+                    <th>Модель трансмиссии (производитель, артикул)</th>
+                    <th>Зав.№ трансмиссии</th>
+                    <th>Модель ведущего моста</th>
+                    <th>Зав.№ ведущего моста</th>
+                    <th>Модель управляемого моста</th>
+                    <th>Зав.№ управляемого моста</th>
+                    <th>Дата отгузки с завода</th>
+                    <th>Покупатель</th>
+                    <th>Грузополучатель (конечный потребитель)</th>
+                    <th>Адрем поставки (эксплуатации)</th>
+                    <th>Комплектация (доп.опции)</th>
+                    <th>Сервисная компания</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for machine in machines %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td> <!-- Автоматическая нумерация -->
+                        <td>{{ machine.name }}</td>
+                        <td>{{ machine.serial_number }}</td>
+                        <td>{{ machine.engine_model }}</td>
+                        <td>{{ machine.engine_serial_number }}</td>
+                        <td>{{ machine.transmission_model }}</td>
+                        <td>{{ machine.transmission_serial_number }}</td>
+                        <td>{{ machine.axle_model }}</td>
+                        <td>{{ machine.axle_serial_number }}</td>
+                        <td>{{ machine.steering_axle_model }}</td>
+                        <td>{{ machine.steering_axle_serial_number }}</td>
+                        <td>{{ machine.shipment_date }}</td>
+                        <td>{{ machine.client }}</td>
+                        <td>{{ machine.recipient }}</td>
+                        <td>{{ machine.delivery_address }}</td>
+                        <td>{{ machine.configuration }}</td>
+                        <td>{{ machine.service_company }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div id="tab2" class="tab tab-content">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>№ п/п</th>
+                    <th>Зав.№ машины</th>
+                    <th>Вид ТО</th>
+                    <th>Дата проведения ТО</th>
+                    <th>Наработка, м/час</th>
+                    <th>№ заказ-наряда</th>
+                    <th>Дата заказ-наряда</th>
+                    <th>Организация, проводившая ТО</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for maintenance in maintenances %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ maintenance.machine.name }}</td>
+                <td>{{ maintenance.service_type.name }}</td>
+                <td>{{ maintenance.maintenance_date }}</td>
+                <td>{{ maintenance.operating_hours }}</td>
+                <td>{{ maintenance.order_number }}</td>
+                <td>{{ maintenance.order_date }}</td>
+                <td>{{ maintenance.service_organization.name }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8">Нет данных о техническом обслуживании.</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div id="tab3" class="tab tab-content">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>№ п/п</th>
+                    <th>Зав.№ машины</th>
+                    <th>Дата отказа</th>
+                    <th>Наработка, м/час</th>
+                    <th>Узел отказа</th>
+                    <th>Описание отказа</th>
+                    <th>Способ восстановления</th>
+                    <th>Используемые запасные части</th>
+                    <th>Дата восстановления</th>
+                    <th>Время простоя техники</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for claim in claims %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ claim.machine.name }}</td>
+                    <td>{{ claim.rejection_date }}</td>
+                    <td>{{ claim.operating_hours }}</td>
+                    <td>{{ claim.failure_node.name }}</td>
+                    <td>{{ claim.failure_description }}</td>
+                    <td>{{ claim.recovery_method.name }}</td>
+                    <td>{{ claim.used_spare_parts }}</td>
+                    <td>{{ claim.recovery_date }}</td>
+                    <td>{{ claim.downtime_duration }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="10">Нет данных о заявках на отказ.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <script>
+        function openTab(evt, tabName) {
+            // Скрываем все вкладки
+            var tabs = document.getElementsByClassName("tab");
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].style.display = "none";
+            }
+    
+            // Убираем активный класс у всех кнопок
+            var buttons = document.getElementsByClassName("tab-button");
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove("active");
+            }
+    
+            // Показываем текущую вкладку и добавляем активный класс к кнопке
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+    
+
+{% endblock %}    

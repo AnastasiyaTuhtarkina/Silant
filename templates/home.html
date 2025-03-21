@@ -1,0 +1,79 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<h1>Проверьте комплектацию и технические характеристики техники "Мой Силант"</h1>
+    <p>Введите заводской номер машины для поиска:</p>
+    <form method="GET" action="">
+        <input type="text" name="search" value="{{ search_query }}" placeholder="Заводской номер" required>
+        <button type="submit">Поиск</button>
+    </form>
+
+    {% if machines %}
+        <h2>Информация о комплектации и технические характеристики техники Силант</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>№ п/п</th>
+                    <th>Модель техники</th>
+                    <th>Зав.№ машины</th>
+                    <th>Модель двигателя</th>
+                    <th>Зав.№ двигателя</th>
+                    <th>Модель трансмиссии (производитель, артикул)</th>
+                    <th>Зав.№ трансмиссии</th>
+                    <th>Модель ведущего моста</th>
+                    <th>Зав.№ ведущего моста</th>
+                    <th>Модель управляемого моста</th>
+                    <th>Зав.№ управляемого моста</th>
+                    <th>Дата отгузки с завода</th>
+                    <th>Покупатель</th>
+                    <th>Грузополучатель (конечный потребитель)</th>
+                    <th>Адрем поставки (эксплуатации)</th>
+                    <th>Комплектация (доп.опции)</th>
+                    <th>Сервисная компания</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for machine in machines %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td> <!-- Автоматическая нумерация -->
+                        <td>{{ machine.name }}</td>
+                        <td>{{ machine.serial_number }}</td>
+                        <td>{{ machine.engine_model }}</td>
+                        <td>{{ machine.engine_serial_number }}</td>
+                        <td>{{ machine.transmission_model }}</td>
+                        <td>{{ machine.transmission_serial_number }}</td>
+                        <td>{{ machine.axle_model }}</td>
+                        <td>{{ machine.axle_serial_number }}</td>
+                        <td>{{ machine.steering_axle_model }}</td>
+                        <td>{{ machine.steering_axle_serial_number }}</td>
+                        <td>{{ machine.shipment_date }}</td>
+                        <td>{{ machine.client }}</td>
+                        <td>{{ machine.recipient }}</td>
+                        <td>{{ machine.delivery_address }}</td>
+                        <td>{{ machine.configuration }}</td>
+                        <td>{{ machine.service_company }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Нет машин, соответствующих вашему запросу.</p>
+    {% endif %}
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; первая</a>
+                <a href="?page={{ page_obj.previous_page_number }}">предыдущая</a>
+            {% endif %}
+    
+            <span class="current">
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+            </span>
+    
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">следующая</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">последняя &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+{% endblock content %}
