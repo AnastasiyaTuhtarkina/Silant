@@ -1,20 +1,32 @@
 {% extends 'index.html' %}
 
 {% block content %}
-<h1> {% if user.groups.filter(name='Клиенты').exists %}
-    Клиент
-{% elif user.groups.filter(name='Сервисные компании').exists %}
-    Сервисная компания
+<h1>
+    {% if user.groups.all %}
+        {% for group in user.groups.all %}
+            {% if group.name == 'Клиент' %}
+                Клиент {{ user.first_name }}
+            {% elif group.name == 'Сервисная компания' %}
+                Сервисная компания {{ user.first_name }}
+            {% elif group.name == 'Менеджер' %}
+                Менеджер 
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 </h1>
+    {% load static %}
     <p>Информация о комплектации и технических характеристиках Вашей техники</p>
-    <div>
+    <div class="tab-container">
         <button class="tab-button active" onclick="openTab(event, 'tab1')">Общая инфо</button>
         <button class="tab-button" onclick="openTab(event, 'tab2')">ТО</button>
         <button class="tab-button" onclick="openTab(event, 'tab3')">Рекламация</button>
     </div>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css">
+
     
     <div id="tab1" class="tab tab-content" style="display: block;">
-        <table border="1">
+        <table class="table" id="machineTable">
             <thead>
                 <tr>
                     <th>№ п/п</th>
@@ -37,10 +49,10 @@
                 </tr>
             </thead>
             <tbody>
-                {% for machine in machines %}
+                {% for machine in page_obj %}
                     <tr>
                         <td>{{ forloop.counter }}</td> <!-- Автоматическая нумерация -->
-                        <td>{{ machine.name }}</td>
+                        <td>{{ machine.model }}</td>
                         <td>{{ machine.serial_number }}</td>
                         <td>{{ machine.engine_model }}</td>
                         <td>{{ machine.engine_serial_number }}</td>
@@ -63,7 +75,7 @@
     </div>
     
     <div id="tab2" class="tab tab-content">
-        <table border="1">
+        <table id="maintenanceTable" border="1">
             <thead>
                 <tr>
                     <th>№ п/п</th>
@@ -77,7 +89,7 @@
                 </tr>
             </thead>
             <tbody>
-            {% for maintenance in maintenances %}
+            {% for maintenance in page_obj %}
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ maintenance.machine.name }}</td>
@@ -98,7 +110,7 @@
     </div>
     
     <div id="tab3" class="tab tab-content">
-        <table border="1">
+        <table id="claimTable" border="1">
             <thead>
                 <tr>
                     <th>№ п/п</th>
@@ -136,25 +148,13 @@
         </table>
     </div>
     
-    <script>
-        function openTab(evt, tabName) {
-            // Скрываем все вкладки
-            var tabs = document.getElementsByClassName("tab");
-            for (var i = 0; i < tabs.length; i++) {
-                tabs[i].style.display = "none";
-            }
-    
-            // Убираем активный класс у всех кнопок
-            var buttons = document.getElementsByClassName("tab-button");
-            for (var i = 0; i < buttons.length; i++) {
-                buttons[i].classList.remove("active");
-            }
-    
-            // Показываем текущую вкладку и добавляем активный класс к кнопке
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.classList.add("active");
-        }
-    </script>
-    
+    <!-- Подключение jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 
-{% endblock %}    
+<!-- Подключение JavaScript DataTables -->
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+
+<script src="{% static 'js/home_auth.js' %}"></script>
+
+{% endblock %}
+

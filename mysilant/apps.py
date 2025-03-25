@@ -1,4 +1,7 @@
 from django.apps import AppConfig
+import logging
+
+logger = logging.getLogger(__name__)
 
 class MysilantConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
@@ -9,6 +12,12 @@ class MysilantConfig(AppConfig):
 
         # Создание групп, только если они еще не существуют
         from django.contrib.auth.models import Group
-        Group.objects.get_or_create(name='Клиент')
-        Group.objects.get_or_create(name='Сервисная организация')
-        Group.objects.get_or_create(name='Менеджер')
+        from django.db import IntegrityError
+
+        try:
+            Group.objects.get_or_create(name='Клиент')
+            Group.objects.get_or_create(name='Сервисная организация')
+            Group.objects.get_or_create(name='Менеджер')
+            logger.info("Группы успешно созданы или уже существуют.")
+        except IntegrityError as e:
+            logger.error(f"Ошибка при создании групп: {e}")

@@ -1,17 +1,20 @@
 {% extends 'index.html' %}
 
 {% block content %}
-
-<h2>Регистрация</h2>
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert">{{ message }}</div>
-    {% endfor %}
-{% endif %}
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Отправить заявку</button>
+<body class="reg">
+    <div class="container_reg">
+        <h2>Регистрация</h2>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Отправить заявку</button>
+        </form>
+    </div>
     
     <script>
         var modal = document.getElementById("modal");
@@ -33,5 +36,5 @@
         }
     </script>
     
-    </body>
+</body>
 {% endblock %}  

@@ -33,7 +33,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for machine in machines %}
+                {% for machine in page_obj %}
                     <tr>
                         <td>{{ forloop.counter }}</td> <!-- Автоматическая нумерация -->
                         <td>{{ machine.name }}</td>

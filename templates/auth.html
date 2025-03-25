@@ -1,19 +1,21 @@
 {% extends 'index.html' %}
 
 {% block content %}
-<body>
-    <h2>Авторизация</h2>
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Войти</button>
-    </form>
-    <p>Нет аккаунта? <a href="{% url 'reg' %}">Зарегистрируйтесь</a></p>
+<body class="auth">
+    <div class="container_auth">
+        <h2>Авторизация</h2>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Войти</button>
+        </form>
+        <p>Нет аккаунта? <a href="{% url 'reg_view' %}">Зарегистрируйтесь</a></p>
+    </div>
 </body>
 
 {% endblock %}

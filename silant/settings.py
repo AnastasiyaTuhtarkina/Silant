@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'django_filters',
+    'django_flatpickr',
     'rest_framework',
     'mysilant',
 ]
@@ -111,7 +112,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
+TIME_ZONE = 'Europe/Moscow'
 
 TIME_ZONE = 'UTC'
 
@@ -151,7 +153,7 @@ ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_SIGNUP_OPEN = False  # Запретить регистрацию
 ACCOUNT_EMAIL_VERIFICATION = 'none'  # Отключаем подтверждение email
 
-ACCOUNT_ADAPTER = 'mysilant.adapter.MyAccountAdapter'
+ACCOUNT_ADAPTER = 'mysilant.adapter.CustomAccountAdapter'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'localhost'
@@ -159,6 +161,13 @@ EMAIL_PORT = 25  # или 587, если вы настроили smtp4dev на э
 EMAIL_USE_TLS = False  # smtp4dev не требует TLS
 EMAIL_HOST_USER = ''  # Не требуется
 EMAIL_HOST_PASSWORD = ''  # Не требуется
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-silant-cache',
+    }
+}
 
 LOGGING = {
     'version': 1,

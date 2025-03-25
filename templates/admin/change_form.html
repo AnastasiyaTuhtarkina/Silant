@@ -1,0 +1,9 @@
+{% extends "admin/change_form.html" %}
+
+{% load static %}  <!-- Загружаем тег static -->
+
+{% block extrastyle %}
+{{ block.super }}
+<!-- Подключаем кастомные стили -->
+<link rel="stylesheet" href="{% static 'css/flatpickr_custom.css' %}">
+{% endblock %}

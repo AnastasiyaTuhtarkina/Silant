@@ -1,15 +1,17 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone  # Импортируем timezone
 
 
 class Client(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, default="Default Name", verbose_name='Название компании')
+    created_at = models.DateTimeField(default=timezone.now)  # Пример поля с текущим временем по умолчанию
 
     def __str__(self):
-        return self.user.first_name
+        return f"{self.name}" if self.user else self.name
     
     class Meta:
         verbose_name = 'Клиент'
@@ -17,17 +19,15 @@ class Client(models.Model):
     
 
 class ServiceOrganization(models.Model):
-    user = models.OneToOneField(
-    User, 
-    on_delete=models.CASCADE, 
+    user = models.OneToOneField(User, on_delete=models.CASCADE, 
     null=True,  # Разрешаем NULL в базе данных
     blank=True  # Разрешаем пустое значение в формах
 )
-    name = models.CharField(max_length=255, verbose_name='Название компании')
+    name = models.CharField(max_length=255, default="Default Name", verbose_name='Название компании')
     description = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
-        return f"{self.name} ({self.user.username})" if self.user else self.name
+        return f"{self.name}" if self.user else self.name
     
     class Meta:
         verbose_name = 'Сервисная компания'
@@ -36,9 +36,11 @@ class ServiceOrganization(models.Model):
 
 class Manager(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, verbose_name='Имя менеджера')
+    created_at = models.DateTimeField(default=timezone.now)  # Пример поля с текущим временем по умолчанию
 
     def __str__(self):
-        return self.user.username 
+        return f"{self.name}" if self.user else self.name 
     
     class Meta:
         verbose_name = 'Менеджер'
@@ -89,6 +91,34 @@ class Machine(models.Model):
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, null=True, related_name='machine', verbose_name='Клиент')
     service_company = models.ForeignKey(ServiceOrganization, on_delete=models.SET_NULL, null=True, related_name='machine', verbose_name='Сервисная компания')
     
+    def clean(self):
+        super().clean()
+
+        # Словарь для связи полей модели Machine с entity_name справочников
+        reference_fields = {
+            'model': 'Модель техники',
+            'engine_model': 'Модель двигателя',
+            'transmission_model': 'Модель трансмиссии',
+            'axle_model': 'Модель ведущего моста',
+            'steering_axle_model': 'Модель управляемого моста',
+        }
+
+        # Проверяем каждое поле
+        for field_name, entity_name in reference_fields.items():
+            field_value = getattr(self, field_name)
+            if field_value:
+                try:
+                    entity = Entity.objects.get(name=entity_name)
+                    if field_value.entity != entity:
+                        raise ValidationError({
+                            field_name: f'Значение должно принадлежать справочнику "{entity_name}".'
+                        })
+                except Entity.DoesNotExist:
+                    raise ValidationError({
+                        field_name: f'Справочник "{entity_name}" не найден.'
+                    })
+
+
     def __str__(self):
         return f"{self.serial_number} - {self.model.name}"
     
@@ -107,6 +137,30 @@ class TechnicalMaintenance(models.Model):
     content_type = models.ForeignKey(ServiceOrganization, on_delete=models.CASCADE, null=True, related_name='content_type', verbose_name='Организация, проводившая ТО')
     service_organization = models.ForeignKey(ServiceOrganization, on_delete=models.SET_NULL, null=True, related_name='performing_services', verbose_name='Сервисная организация')
     
+    def clean(self):
+        super().clean()
+
+        # Словарь для связи полей модели Machine с entity_name справочников
+        reference_fields = {
+            'service_type': 'Вид ТО',
+        }
+
+        # Проверяем каждое поле
+        for field_name, entity_name in reference_fields.items():
+            field_value = getattr(self, field_name)
+            if field_value:
+                try:
+                    entity = Entity.objects.get(name=entity_name)
+                    if field_value.entity != entity:
+                        raise ValidationError({
+                            field_name: f'Значение должно принадлежать справочнику "{entity_name}".'
+                        })
+                except Entity.DoesNotExist:
+                    raise ValidationError({
+                        field_name: f'Справочник "{entity_name}" не найден.'
+                    })
+
+
     def __str__(self):
         return f"{self.service_type.name} for {self.machine.serial_number} on {self.maintenance_date}"
     
@@ -134,6 +188,31 @@ class Claim(models.Model):
             downtime = self.recovery_date - self.rejection_date
             self.downtime_duration = downtime
         super().save(*args, **kwargs)
+
+    def clean(self):
+        super().clean()
+
+        # Словарь для связи полей модели Machine с entity_name справочников
+        reference_fields = {
+            'failure_node': 'Узел отказа',
+            'recovery_method': 'Способ восстановления',
+        }
+
+        # Проверяем каждое поле
+        for field_name, entity_name in reference_fields.items():
+            field_value = getattr(self, field_name)
+            if field_value:
+                try:
+                    entity = Entity.objects.get(name=entity_name)
+                    if field_value.entity != entity:
+                        raise ValidationError({
+                            field_name: f'Значение должно принадлежать справочнику "{entity_name}".'
+                        })
+                except Entity.DoesNotExist:
+                    raise ValidationError({
+                        field_name: f'Справочник "{entity_name}" не найден.'
+                    })
+ 
 
     def __str__(self):
         return f'Claim for {self.machine.serial_number} - Rejection Date: {self.rejection_date}'

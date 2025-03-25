@@ -1,11 +1,13 @@
 from django.contrib import admin
+from django.core.cache import cache
+from django_flatpickr.widgets import DatePickerInput
+from django_flatpickr.schemas import FlatpickrOptions
+
 from .models import *
 
 
 admin.site.register(Client)
 admin.site.register(Manager)
-admin.site.register(TechnicalMaintenance)
-admin.site.register(Claim)
 
 
 @admin.register(Entity)
@@ -40,12 +42,156 @@ class MachineAdmin(admin.ModelAdmin):
 
         # Динамически фильтруем справочники для каждого поля
         if db_field.name in reference_fields:
-            # Находим нужный entity по названию
             entity_name = reference_fields[db_field.name]
-            try:
-                entity = Entity.objects.get(name=entity_name)  # Находим Entity с соответствующим name
-                kwargs["queryset"] = Reference.objects.filter(entity=entity)
-            except Entity.DoesNotExist:
-                kwargs["queryset"] = Reference.objects.none()  # Если entity не найден, не показывать записи
+            cache_key = f'reference_queryset_{entity_name}'
+
+            # Пытаемся получить данные из кэша
+            queryset = cache.get(cache_key)
+            if not queryset:
+                try:
+                    entity = Entity.objects.get(name=entity_name)
+                    queryset = Reference.objects.filter(entity=entity)
+                    cache.set(cache_key, queryset, timeout=60 * 60)  # Кэшируем на 1 час
+                except Entity.DoesNotExist:
+                    queryset = Reference.objects.none()
+
+            kwargs["queryset"] = queryset
 
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
+    
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        if db_field.name == 'shipment_date':  # Замените на имя вашего поля
+            flatpickr_options = FlatpickrOptions(
+                altFormat="d-m-Y",  # Формат даты
+                minDate="today",    # Минимальная дата — сегодня
+                locale="ru",        # Русская локализация
+            )
+
+            kwargs['widget'] = DatePickerInput(
+                attrs={
+                    'class': 'my-custom-class',  # CSS-класс
+                },
+                options=flatpickr_options
+            )
+        return super().formfield_for_dbfield(db_field, **kwargs)
+
+    class Media:
+        css = {
+            'all': ('css/flatpickr_custom.css',)  # Подключение кастомных стилей
+        }
+        js = [
+            'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js',  # Русская локализация
+        ]
+
+@admin.register(TechnicalMaintenance)
+class TechMaintAdmin(admin.ModelAdmin):
+    list_display = ('machine', 'service_type', 'maintenance_date', 'operating_hours', 'order_number', 'order_date')  # Кортеж с одним элементом
+    list_filter = ('service_type',)   # Кортеж с одним элементом
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        # Словарь для связи полей модели Machine с entity_name справочников
+        reference_fields = {
+            'service_type': 'Вид ТО',
+        }
+
+        # Динамически фильтруем справочники для каждого поля
+        if db_field.name in reference_fields:
+            entity_name = reference_fields[db_field.name]
+            cache_key = f'reference_queryset_{entity_name}_{db_field.name}'  # Уникальный ключ
+
+            # Пытаемся получить данные из кэша
+            queryset = cache.get(cache_key)
+            if not queryset:
+                try:
+                    entity = Entity.objects.get(name=entity_name)
+                    queryset = Reference.objects.filter(entity=entity)
+                    cache.set(cache_key, queryset, timeout=60 * 60)  # Кэшируем на 1 час
+                except Entity.DoesNotExist:
+                    queryset = Reference.objects.none()
+                    # Логирование или уведомление об ошибке
+                    print(f"Entity with name '{entity_name}' does not exist.")
+
+            kwargs["queryset"] = queryset
+
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+    
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        if db_field.name == 'maintenance_date' or 'order_date':  # Замените на имя вашего поля
+            flatpickr_options = FlatpickrOptions(
+                altFormat="d-m-Y",  # Формат даты
+                minDate="today",    # Минимальная дата — сегодня
+                locale="ru",        # Русская локализация
+            )
+
+            kwargs['widget'] = DatePickerInput(
+                attrs={
+                    'class': 'my-custom-class',  # CSS-класс
+                },
+                options=flatpickr_options
+            )
+        return super().formfield_for_dbfield(db_field, **kwargs)
+
+    class Media:
+        css = {
+            'all': ('css/flatpickr_custom.css',)  # Подключение кастомных стилей
+        }
+        js = [
+            'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js',  # Русская локализация
+        ]
+
+    
+@admin.register(Claim)
+class ClaimAdmin(admin.ModelAdmin):
+    list_display = ('machine', 'rejection_date', 'operating_hours', 'failure_node', 'recovery_method', 'recovery_date')  # Кортеж с одним элементом
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        # Словарь для связи полей модели Machine с entity_name справочников
+        reference_fields = {
+            'failure_node': 'Узел отказа',
+            'recovery_method': 'Способ восстановления',
+        }
+
+        # Динамически фильтруем справочники для каждого поля
+        if db_field.name in reference_fields:
+            entity_name = reference_fields[db_field.name]
+            cache_key = f'reference_queryset_{entity_name}_{db_field.name}'  # Уникальный ключ
+
+            # Пытаемся получить данные из кэша
+            queryset = cache.get(cache_key)
+            if not queryset:
+                try:
+                    entity = Entity.objects.get(name=entity_name)
+                    queryset = Reference.objects.filter(entity=entity)
+                    cache.set(cache_key, queryset, timeout=60 * 60)  # Кэшируем на 1 час
+                except Entity.DoesNotExist:
+                    queryset = Reference.objects.none()
+                    # Логирование или уведомление об ошибке
+                    print(f"Entity with name '{entity_name}' does not exist.")
+
+            kwargs["queryset"] = queryset
+
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+    
+    def formfield_for_dbfield(self, db_field, **kwargs):
+        if db_field.name == 'rejection_date' or 'recovery_date':  # Замените на имя вашего поля
+            flatpickr_options = FlatpickrOptions(
+                altFormat="d-m-Y",  # Формат даты
+                minDate="today",    # Минимальная дата — сегодня
+                locale="ru",        # Русская локализация
+            )
+
+            kwargs['widget'] = DatePickerInput(
+                attrs={
+                    'class': 'my-custom-class',  # CSS-класс
+                },
+                options=flatpickr_options
+            )
+        return super().formfield_for_dbfield(db_field, **kwargs)
+
+    class Media:
+        css = {
+            'all': ('css/flatpickr_custom.css',)  # Подключение кастомных стилей
+        }
+        js = [
+            'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js',  # Русская локализация
+        ]

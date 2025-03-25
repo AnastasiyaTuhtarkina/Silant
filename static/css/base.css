@@ -18,24 +18,76 @@
 body {
     font-family: AstraRegular;
     background: #EBE6D6;
-    /* display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh; */
+    display: flex; /* Используем Flexbox */
+    justify-content: center; /* Центрируем по горизонтали */
+    align-items: center; /* Центрируем по вертикали */
+    margin: 0; /* Убираем отступы */
 }
 
 .wrapper {
     padding: 10px;
-    max-width: 1200px; /* Максимальная ширина */
-    margin: auto; /* Центрируем содержимое */
+    width: 100%; /* Занимает всю доступную ширину */
+    margin: 5px 5px; /* Отступы сверху и снизу 10px, слева и справа автоматически */
+    box-sizing: border-box; /* Включаем padding в общую ширину */
 }
 
+header {
+    width: 100%; /* Занимает всю ширину */
+    background-color: #EBE6D6; /* Цвет фона для заголовка (можно изменить) */
+}
+
+
 .container {
+    width: 100%;
+    display: flex;
+    margin: 0 auto; /* Центрируем контейнер */
+    justify-content: space-between; /* Распределяет элементы по всей ширине */
+    align-items: center; /* Выравнивает элементы по вертикали */
     background: #EBE6D6;
-    padding: 20px;
+    padding: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+body.auth {
+    display: flex; /* Используем Flexbox */
+    justify-content: center; /* Центрируем по горизонтали */
+    align-items: center; /* Центрируем по вертикали */
+    margin: 10px; /* Убираем отступы */
+    padding: 10px;
+}
+
+.container_auth {
+    text-align: center; /* Центрируем текст внутри контейнера */
+    padding: 40px 20px;
+    border: 1px solid #ccc; /* Граница контейнера (по желанию) */
+    border-radius: 5px; /* Закругление углов (по желанию) */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тень для контейнера (по желанию) */
+    width: 1476px; /* Ширина контейнера (можно изменить) */
+}
+
+.container_auth p {
+    margin: 20px 0; /* Устанавливаем отступы сверху и снизу для каждого элемента формы */
+}
+
+body.reg {
+    display: flex; /* Используем Flexbox */
+    justify-content: center; /* Центрируем по горизонтали */
+    align-items: center; /* Центрируем по вертикали */
+    margin: 0; /* Убираем отступы */
+}
+
+.container_reg {
+    text-align: center; /* Центрируем текст внутри контейнера */
+    padding: 40px 20px; /* Увеличиваем отступы: 40px сверху и снизу, 20px слева и справа */
+    border: 1px solid #ccc; /* Граница контейнера (по желанию) */
+    border-radius: 5px; /* Закругление углов (по желанию) */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тень для контейнера (по желанию) */
+    width: 1476px; /* Ширина контейнера (можно изменить) */
+}
+
+.container_reg p {
+    margin: 20px 0; /* Устанавливаем отступы сверху и снизу для каждого элемента формы */
+}
 .header-title {
     margin-top: 10px;
     font-size: 24px;
@@ -46,6 +98,7 @@ body {
 .logo {
     background-color: #EBE6D6; /* Цвет фона логотипа */
 }
+
 
 .auth-button {
     display: block; /* Переводим кнопку в блочный элемент */
@@ -73,6 +126,7 @@ nav .btn {
 h1 {
     font-size: 24px;
     text-align: center; /* Центрируем заголовок */
+    width: 100%;
 }
 
 .content {
@@ -86,6 +140,35 @@ h1 {
     border: 1px solid #ccc;
 }
 
+.tab-container, p {
+    display: flex; /* Используем Flexbox */
+    justify-content: center; /* Центрируем кнопки по горизонтали */
+    margin-top: 20px; /* Отступ сверху для визуального разделения */
+}
+
+/* Стили для вкладок */
+.tab-button {
+    margin: 0 10px; /* Отступы между кнопками */
+    padding: 10px 20px; /* Внутренние отступы для кнопок */
+    cursor: pointer; /* Указатель при наведении */
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    display: inline-block;
+    width: 150px; /* Фиксированная ширина */
+    text-align: center; /* Выравнивание текста по центру */
+}
+.tab-button.active {
+    background-color: #163E6C;
+    color: white;
+}
+.tab {
+    display: none; /* По умолчанию все вкладки скрыты */
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-top: 10px;
+}
+
+
 .table {
     width: 100%; /* Устанавливаем ширину в 100% */
     table-layout: auto; /* Позволяет столбцам изменяться в зависимости от содержимого */
@@ -93,10 +176,16 @@ h1 {
     font-size: 9px; /* Установка размера шрифта для таблицы */
 }
 
+.tab-content {
+    width: 100%; /* Устанавливаем ширину в 100% */
+}
+
 th, td {
-    padding: 10px; /* Отступы внутри ячеек */
+    padding: 5px; /* Отступы внутри ячеек */
     border: 1px solid #ccc; /* Граница ячеек */
     text-align: center; /* Центрируем текст в ячейках */
+    overflow-wrap: break-word; /* Позволяет переносить длинные слова и слоги */
+    word-wrap: break-word; /* Для совместимости с более старыми браузерами */
 }
 
 th {
@@ -104,11 +193,41 @@ th {
 }
 
 td {
-    font-size: 10px; /* Размер шрифта для ячеек данных */
+    font-size: 9px; /* Размер шрифта для ячеек данных */
+}
+
+table.dataTable thead th select {
+    width: 100%; /* Устанавливаем ширину выпадающего списка на 100% */
+    box-sizing: border-box; /* Учитываем отступы и границы в ширине */
+}
+
+.footer-row {
+    display: flex; /* Используем Flexbox для расположения колонок */
+    justify-content: space-between; /* Распределяем пространство между колонками */
+    align-items: flex-start; /* Выравниваем содержимое по верхнему краю */
+}
+
+.footer-column {
+    flex: 1; /* Каждая колонка занимает равное пространство */
+    padding: 10px; /* Отступы внутри колонок */
+}
+
+h4 {
+    margin-bottom: 10px; /* Отступ снизу для заголовков */
+}
+
+p {
+    margin: 0; /* Убираем отступы у параграфов */
 }
 
 @media (max-width: 768px) {
     .table {
-        overflow-x: auto; /* Добавляет горизонтальную прокрутку на маленьких экранах */
+        display: block; /* Делаем таблицу блочным элементом */
+        overflow-x: auto; /* Добавляем горизонтальную прокрутку на маленьких экранах */
+        white-space: nowrap; /* Запрещаем перенос строк */
+    }
+
+    th, td {
+        min-width: 100px; /* Минимальная ширина ячеек для лучшего отображения */
     }
 }

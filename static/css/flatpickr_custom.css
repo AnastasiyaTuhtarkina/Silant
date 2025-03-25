@@ -1,0 +1,35 @@
+/* Основной цвет фона календаря */
+.flatpickr-calendar {
+    background: #EBE6D6;  /* Серый фон */
+}
+
+/* Цвет текста */
+.flatpickr-calendar .flatpickr-month,
+.flatpickr-calendar .flatpickr-weekdays,
+.flatpickr-calendar .flatpickr-weekday,
+.flatpickr-calendar .flatpickr-day {
+    color: #333;  /* Тёмный текст */
+}
+
+/* Цвет выбранной даты */
+.flatpickr-calendar .flatpickr-day.selected {
+    background: #D20A11;  /* Синий фон */
+    border-color: #000000;  /* Синяя рамка */
+    color: #EBE6D6;  /* Белый текст */
+}
+
+/* Цвет при наведении на дату */
+.flatpickr-calendar .flatpickr-day:hover {
+    background: #163E6C;  /* Тёмно-синий фон */
+    color: #EBE6D6;  /* Белый текст */
+}
+
+/* Цвет текущей даты */
+.flatpickr-calendar .flatpickr-day.today {
+    border-color: #000000;  /* Синяя рамка */
+}
+
+/* Цвет отключённых дат */
+.flatpickr-calendar .flatpickr-day.disabled {
+    color: #ccc;  /* Серый текст */
+}

@@ -9,58 +9,106 @@
     font-size: 60px;
 } 
 
+* {
+    box-sizing: border-box;
+    padding: 0; /* Убираем внутренние отступы для всех элементов */
+    margin: 0; /* Убираем отступы у всех элементов, чтобы избежать смещения */
+}
+
+body {
+    font-family: AstraRegular;
+    background: #EBE6D6;
+    /* display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; */
+}
+
+.wrapper {
+    padding: 10px;
+    max-width: 1200px; /* Максимальная ширина */
+    margin: auto; /* Центрируем содержимое */
+}
 
 .container {
-font-family: AstraRegular;    
-width: 80%;
-margin: auto;
-background: white;
-padding: 20px;
-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-
+    background: #EBE6D6;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .header-title {
-    margin-top: 20px;
+    margin-top: 10px;
     font-size: 24px;
     font-weight: bold;
+    text-align: center; /* Центрируем заголовок */
 }
 
-.header-title {
-    margin-top: 20px;
-    font-size: 24px;
-    font-weight: bold;
+.logo {
+    background-color: #EBE6D6; /* Цвет фона логотипа */
 }
+
 .auth-button {
-    border: 2px solid #007bff; /* Цвет рамки */
-    color: #007bff; /* Цвет текста кнопки */
+    display: block; /* Переводим кнопку в блочный элемент */
+    margin: 20px auto; /* Центрируем кнопку и добавляем отступы сверху и снизу */
+    border: 2px solid #163E6C; /* Цвет рамки */
+    color: #163E6C; /* Цвет текста кнопки */
 }
+
 .auth-button:hover {
-    background-color: #007bff; /* Цвет фона при наведении */
+    background-color: #163E6C; /* Цвет фона при наведении */
     color: white; /* Цвет текста при наведении */
 }
 
+nav {
+    background-color: #FFFFFF;
+    width: 100%; /* Обеспечиваем заполнение */
+    display: flex; /* Используем flexbox для навигации */
+    justify-content: center; /* Центрируем содержимое навигации */
+}
+
+nav .btn {
+    color: #163E6C;
+}
+
 h1 {
-font-size: 24px;
+    font-size: 24px;
+    text-align: center; /* Центрируем заголовок */
 }
+
 .content {
-margin: 20px 0;
+    margin: 20px 0;
 }
+
 .search, .result {
-margin: 20px 0;
-padding: 15px;
-background: #e9e9e9;
-border: 1px solid #ccc;
+    margin: 20px 0;
+    padding: 15px;
+    background: #e9e9e9;
+    border: 1px solid #ccc;
 }
+
 .table {
-width: 100%;
-border-collapse: collapse;
-margin-top: 10px;
+    width: 100%; /* Устанавливаем ширину в 100% */
+    table-layout: auto; /* Позволяет столбцам изменяться в зависимости от содержимого */
+    border-collapse: collapse; /* Для удаления двойных границ */
+    font-size: 9px; /* Установка размера шрифта для таблицы */
 }
-.table, .table th, .table td {
-border: 1px solid #ccc;
+
+th, td {
+    padding: 10px; /* Отступы внутри ячеек */
+    border: 1px solid #ccc; /* Граница ячеек */
+    text-align: center; /* Центрируем текст в ячейках */
 }
-.table th, .table td {
-padding: 10px;
-text-align: left;
+
+th {
+    font-size: 10px; /* Размер шрифта для заголовков */
+}
+
+td {
+    font-size: 10px; /* Размер шрифта для ячеек данных */
+}
+
+@media (max-width: 768px) {
+    .table {
+        overflow-x: auto; /* Добавляет горизонтальную прокрутку на маленьких экранах */
+    }
 }
