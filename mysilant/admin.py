@@ -43,7 +43,10 @@ class MachineAdmin(admin.ModelAdmin):
         # Динамически фильтруем справочники для каждого поля
         if db_field.name in reference_fields:
             entity_name = reference_fields[db_field.name]
-            cache_key = f'reference_queryset_{entity_name}'
+            safe_entity_name = entity_name.replace(':', '_')
+            safe_db_field_name = db_field.name.replace(':', '_')
+
+            cache_key = f'reference_queryset_{safe_entity_name}_{safe_db_field_name}'  # Уникальный ключ
 
             # Пытаемся получить данные из кэша
             queryset = cache.get(cache_key)
@@ -63,7 +66,7 @@ class MachineAdmin(admin.ModelAdmin):
         if db_field.name == 'shipment_date':  # Замените на имя вашего поля
             flatpickr_options = FlatpickrOptions(
                 altFormat="d-m-Y",  # Формат даты
-                minDate="today",    # Минимальная дата — сегодня
+                maxDate="today",    # Максимальная дата — сегодня
                 locale="ru",        # Русская локализация
             )
 
@@ -86,7 +89,7 @@ class MachineAdmin(admin.ModelAdmin):
 @admin.register(TechnicalMaintenance)
 class TechMaintAdmin(admin.ModelAdmin):
     list_display = ('machine', 'service_type', 'maintenance_date', 'operating_hours', 'order_number', 'order_date')  # Кортеж с одним элементом
-    list_filter = ('service_type',)   # Кортеж с одним элементом
+    list_filter = ('service_type', 'machine')   # Кортеж с одним элементом
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         # Словарь для связи полей модели Machine с entity_name справочников
@@ -97,7 +100,10 @@ class TechMaintAdmin(admin.ModelAdmin):
         # Динамически фильтруем справочники для каждого поля
         if db_field.name in reference_fields:
             entity_name = reference_fields[db_field.name]
-            cache_key = f'reference_queryset_{entity_name}_{db_field.name}'  # Уникальный ключ
+            safe_entity_name = entity_name.replace(':', '_')
+            safe_db_field_name = db_field.name.replace(':', '_')
+
+            cache_key = f'reference_queryset_{safe_entity_name}_{safe_db_field_name}'  # Уникальный ключ
 
             # Пытаемся получить данные из кэша
             queryset = cache.get(cache_key)
@@ -116,10 +122,10 @@ class TechMaintAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
     
     def formfield_for_dbfield(self, db_field, **kwargs):
-        if db_field.name == 'maintenance_date' or 'order_date':  # Замените на имя вашего поля
+        if db_field.name in ['maintenance_date', 'order_date']:
             flatpickr_options = FlatpickrOptions(
                 altFormat="d-m-Y",  # Формат даты
-                minDate="today",    # Минимальная дата — сегодня
+                maxDate="today",    # Максимальная дата — сегодня
                 locale="ru",        # Русская локализация
             )
 
@@ -154,7 +160,10 @@ class ClaimAdmin(admin.ModelAdmin):
         # Динамически фильтруем справочники для каждого поля
         if db_field.name in reference_fields:
             entity_name = reference_fields[db_field.name]
-            cache_key = f'reference_queryset_{entity_name}_{db_field.name}'  # Уникальный ключ
+            safe_entity_name = entity_name.replace(':', '_')
+            safe_db_field_name = db_field.name.replace(':', '_')
+
+            cache_key = f'reference_queryset_{safe_entity_name}_{safe_db_field_name}'  # Уникальный ключ
 
             # Пытаемся получить данные из кэша
             queryset = cache.get(cache_key)
@@ -173,10 +182,10 @@ class ClaimAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
     
     def formfield_for_dbfield(self, db_field, **kwargs):
-        if db_field.name == 'rejection_date' or 'recovery_date':  # Замените на имя вашего поля
+        if db_field.name in ['rejection_date', 'recovery_date']: 
             flatpickr_options = FlatpickrOptions(
                 altFormat="d-m-Y",  # Формат даты
-                minDate="today",    # Минимальная дата — сегодня
+                maxDate="today",    # Максимальная дата — сегодня
                 locale="ru",        # Русская локализация
             )
 

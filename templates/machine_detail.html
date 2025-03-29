@@ -1,30 +1,183 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-    </head>
-    <body>
-        {% if user.is_authenticated %}
-            {% if is_manager or machine.client == user or machine.service_organization == user %}
-                <h1>{{ machine.serial_number }}</h1>
-                <p>Клиент: {{ machine.client.username }}</p>
-                <p>Сервисная организация: {{ machine.service_organization.username }}</p>
-            {% else %}
-                <p>У вас нет доступа к этой машине.</p>
-            {% endif %}
-        {% else %}
-            <p>Пожалуйста, авторизуйтесь для доступа к данным.</p>
-        {% endif %}
+{% extends 'index.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <link href="{% static 'css/machine_detail.css' %}" rel="stylesheet">
+{% endblock extra_css %}
+
+{% block content %}
+<div class="tab-container">
+    <button class="tab-button" onclick="openTab(event, 'machineTab')">Общая Информация</button>
+    <button class="tab-button active" onclick="openTab(event, 'maintenanceTab')">Техническое обслуживание</button>
+    <button class="tab-button" onclick="openTab(event, 'claimsTab')">Рекламации</button>
+</div>
+
+<div id="machineTab" class="tab-content" style="display: block;">
+    <h2>Общая Информация</h2>
+    <div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Модель техники</th>
+                <th>Зав.№ машины</th>
+                <th>Модель двигателя</th>
+                <th>Зав.№ двигателя</th>
+                <th>Модель трансмиссии (производитель, артикул)</th>
+                <th>Зав.№ трансмиссии</th>
+                <th>Модель ведущего моста</th>
+                <th>Зав.№ ведущего моста</th>
+                <th>Модель управляемого моста</th>
+                <th>Зав.№ управляемого моста</th>
+                <th>Дата отгузки с завода</th>
+                <th>Покупатель</th>
+                <th>Грузополучатель (конечный потребитель)</th>
+                <th>Адреc поставки (эксплуатации)</th>
+                <th>Комплектация (доп.опции)</th>
+                <th>Сервисная компания</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                    <td>{{ machine.model }}</td>
+                    <td>{{ machine.serial_number }}</td>
+                    <td>{{ machine.engine_model }}</td>
+                    <td>{{ machine.engine_serial_number }}</td>
+                    <td>{{ machine.transmission_model }}</td>
+                    <td>{{ machine.transmission_serial_number }}</td>
+                    <td>{{ machine.axle_model }}</td>
+                    <td>{{ machine.axle_serial_number }}</td>
+                    <td>{{ machine.steering_axle_model }}</td>
+                    <td>{{ machine.steering_axle_serial_number }}</td>
+                    <td>{{ machine.shipment_date }}</td>
+                    <td>{{ machine.client }}</td>
+                    <td>{{ machine.recipient }}</td>
+                    <td>{{ machine.delivery_address }}</td>
+                    <td>{{ machine.configuration }}</td>
+                    <td>{{ machine.service_company }}</td>
+            </tr>
+        </tbody>
+        </table>
+
+<div id="maintenanceTab" class="tab-content active" style="display: block;">
+    <h2>Техническое обслуживание</h2>
+    <div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>№ п/п</th>
+                <th>Зав.№ машины</th>
+                <th>Вид ТО</th>
+                <th>Дата проведения ТО</th>
+                <th>Наработка, м/час</th>
+                <th>№ заказ-наряда</th>
+                <th>Дата заказ-наряда</th>
+                <th>Организация, проводившая ТО</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for maintenance in maintenances %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ maintenance.machine.name }}</td>
+                <td>{{ maintenance.service_type.name }}</td>
+                <td>{{ maintenance.maintenance_date }}</td>
+                <td>{{ maintenance.operating_hours }}</td>
+                <td>{{ maintenance.order_number }}</td>
+                <td>{{ maintenance.order_date }}</td>
+                <td>{{ maintenance.service_organization.name }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">Нет данных о техническом обслуживании.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="claimsTab" class="tab-content" style="display: none;">
+    <h2>Рекламации</h2>
+    <div class="table-container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>№ п/п</th>
+                <th>Зав.№ машины</th>
+                <th>Дата отказа</th>
+                <th>Наработка, м/час</th>
+                <th>Узел отказа</th>
+                <th>Описание отказа</th>
+                <th>Способ восстановления</th>
+                <th>Используемые запасные части</th>
+                <th>Дата восстановления</th>
+                <th>Время простоя техники</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for claim in claims %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ claim.machine.name }}</td>
+                <td>{{ claim.rejection_date }}</td>
+                <td>{{ claim.operating_hours }}</td>
+                <td>{{ claim.failure_node.name }}</td>
+                <td>{{ claim.failure_description }}</td>
+                <td>{{ claim.recovery_method.name }}</td>
+                <td>{{ claim.used_spare_parts }}</td>
+                <td>{{ claim.recovery_date }}</td>
+                <td>{{ claim.downtime_duration }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">Нет данных о заявках на отказ.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Показываем вторую вкладку при загрузке
+        openTab(null, 'maintenanceTab');
+    });
+    
+    function openTab(evt, tabName) {
+        // 1. Скрываем все вкладки
+        const tabs = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.classList.remove('active');
+            tab.style.display = 'none';
+        });
         
-        <script src="" async defer></script>
-    </body>
-</html>
+        // 2. Убираем активный класс у всех кнопок
+        const buttons = document.querySelectorAll('.tab-button');
+        buttons.forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // 3. Показываем выбранную вкладку
+        const activeTab = document.getElementById(tabName);
+        if (activeTab) {
+            activeTab.classList.add('active');
+            activeTab.style.display = 'block';
+        }
+        
+        // 4. Активируем кнопку (если клик был по кнопке)
+        if (evt && evt.currentTarget) {
+            evt.currentTarget.classList.add('active');
+        } else {
+            // Для инициализации активируем кнопку второй вкладки
+            document.querySelector('.tab-button:nth-child(2)').classList.add('active');
+        }
+        
+        // 5. Принудительное обновление для Chrome
+        if (activeTab) {
+            void activeTab.offsetWidth;
+        }
+    }
+</script>
+
+{% endblock content %}

@@ -6,7 +6,7 @@ $(document).ready(function () {
     info: true,
     pageLength: 10,
     language: {
-      url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/ru.json",
+      url: languageUrl, // Используем переменную, переданную из шаблона
     },
     initComplete: function () {
       // Указываем индексы столбцов, которые должны иметь фильтры
@@ -64,3 +64,32 @@ window.onload = function () {
   document.getElementById("tab1").style.display = "block"; // Показываем первую вкладку
   document.querySelector(".tab-button").classList.add("active"); // Делаем первую кнопку активной
 };
+
+$(document).ready(function () {
+  // Обработчик кликов по ячейкам, которые открывают модальное окно
+  $(".clickable-description").on("click", function (event) {
+    event.stopPropagation(); // Остановить дальнейшую обработку события
+    const name = $(this).data("name");
+    const description = $(this).data("description") || "Нет описания"; // Установить значение по умолчанию
+
+    if (name) {
+      // Проверяем, что имя существует
+      $("#modal-title").text(name);
+      $("#modal-description").text(description); // Показываем описание, даже если оно пустое
+      $("#modal").show(); // Показать модальное окно
+    } else {
+      console.warn("Отсутствует имя для отображения в модальном окне.");
+    }
+  });
+
+  // Обработчик кликов по номеру строки (для перенаправления)
+  $(".clickable-row").on("click", function () {
+    const machineId = $(this).closest("tr").data("id"); // Получаем уникальный идентификатор машины
+    console.log(machineId); // Проверяем, что идентификатор извлекается правильно
+    window.location.href = `/machine_detail/${machineId}/`; // Перенаправляем на страницу деталей
+  });
+});
+
+function closeModal() {
+  $("#modal").hide(); // Скрыть модальное окно
+}

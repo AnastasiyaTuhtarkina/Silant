@@ -5,12 +5,13 @@ from functools import wraps
 # Django
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.core.paginator import Paginator, EmptyPage
 from django.db.models import Q
+from django.http import JsonResponse
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import UpdateView
@@ -24,35 +25,39 @@ from .forms import *
 logger = logging.getLogger(__name__)
 def home(request):
     search_query = request.GET.get('search', '')
-    machines = Machine.objects.filter(serial_number__icontains=search_query).order_by('shipment_date')
-    maintenances = TechnicalMaintenance.objects.filter().order_by('maintenance_date')
-    claims = Claim.objects.filter().order_by('rejection_date')
-
-      # Пагинация
-    paginator = Paginator(machines, 10)  # 10 машин на страницу
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    logger.info("Home view accessed")
-
-      # Проверяем, авторизован ли пользователь
+    
+    # Фильтрация машин по пользователю (если авторизован)
     if request.user.is_authenticated:
-        # Логика для зарегистрированных пользователей
+        machines = get_machines_for_user(request.user)  # Используем вашу готовую функцию
+        if search_query:
+            machines = machines.filter(serial_number__icontains=search_query)
+        machines = machines.order_by('shipment_date')
+        
+        # Фильтрация ТО и рекламаций только для машин пользователя
+        maintenances = TechnicalMaintenance.objects.filter(machine__in=machines).order_by('maintenance_date')
+        claims = Claim.objects.filter(machine__in=machines).order_by('rejection_date')
+        
         context = {
             'search_query': search_query,
-            'page_obj': page_obj,
-            'user_machines': machines,  # Пример: передаем все машины для зарегистрированных пользователей
-            'user_maintenances': maintenances,  # Пример: передаем все запланированные ремонты для зарегистрированных пользователей
-            'user_claims': claims,  # Пример: передаем все заявки на ремонты для зарегистрированных пользователей
+            'page_obj': Paginator(machines, 10).get_page(request.GET.get('page')),
+            'maintenances': maintenances,  # Переименовано для соответствия шаблону
+            'claims': claims,              # Переименовано для соответствия шаблону
+            'user_groups': list(request.user.groups.values_list('name', flat=True))
         }
-        return render(request, 'home_auth.html', context)  # Шаблон для зарегистрированных пользователей
+        return render(request, 'home_auth.html', context)
+    
+    # Для неавторизованных - только поиск без фильтрации
     else:
-        # Логика для незарегистрированных пользователей
+        machines = Machine.objects.all()  # Показываем все машины по умолчанию
+        if search_query:
+            machines = machines.filter(serial_number__icontains=search_query)
+            
         context = {
+            'machines': machines,  # Для отладки
             'search_query': search_query,
-            'page_obj': page_obj,
+            'page_obj': Paginator(machines, 10).get_page(request.GET.get('page'))
         }
-        return render(request, 'home.html', context)  # Шаблон для незарегистрированных пользователей
+        return render(request, 'home.html', context)
 
 
 def role_required(*roles):
@@ -78,88 +83,7 @@ def get_client_for_user(user):
         return Client.objects.get(user=user)
     except ObjectDoesNotExist:
         return None
-def get_machines_for_user(user):
-    """
-    Возвращает queryset машин в зависимости от роли пользователя.
     
-    :param user: Пользователь, для которого нужно получить машины.
-    :return: QuerySet машин, доступных для данного пользователя.
-    """
-    # # Константы для групп
-    # MANAGER_GROUP = 'Менеджер'
-    # CLIENT_GROUP = 'Клиент'
-    # SERVICE_GROUP = 'Сервисная организация'
-    
-    # user_groups = set(user.groups.values_list('name', flat=True))
-
-    # if MANAGER_GROUP in user_groups:
-    #     return Machine.objects.all()
-    
-    # if CLIENT_GROUP in user_groups:
-    #     try:
-    #         # Получаем клиента, связанного с пользователем
-    #         # Предполагаем, что у модели Client есть поле user
-    #         client = Client.objects.get(user=user)
-    #         return Machine.objects.filter(client=client)
-    #     except ObjectDoesNotExist:
-    #         # Если клиент не найден, попробуем найти через recipient
-    #         try:
-    #             org_name = user.first_name.strip()
-    #             cleaned_org_name = clean_organization_name(org_name)
-    #             return Machine.objects.filter(recipient__icontains=cleaned_org_name)
-    #         except Exception as e:
-    #             print(f"Ошибка при получении машин для клиента {user}: {e}")
-    #             return Machine.objects.none()
-            
-    # 1. Для менеджеров и суперпользователей - все машины
-    if user.is_superuser or user.groups.filter(name='Менеджер').exists():
-        print("Доступ: менеджер/админ - все машины")
-        return Machine.objects.all()
-
-    # 2. Для клиентов
-    if user.groups.filter(name='Клиент').exists():
-        print("Доступ: клиент - поиск машин")
-        
-        # Вариант 1: Через явную связь Client -> User
-        if hasattr(user, 'client'):
-            print(f"Найден клиент: {user.client}")
-            return Machine.objects.filter(client=user.client)
-        
-        # Вариант 2: Через соответствие имени
-        org_names = [
-            user.first_name,
-            user.username,
-            getattr(user, 'client_name', '')  # Если есть дополнительное поле
-        ]
-        
-        # Фильтруем непустые значения и чистим
-        org_names = [clean_organization_name(name) for name in org_names if name]
-        
-        print(f"Поиск по именам организаций: {org_names}")
-        
-        # Создаём условия для поиска
-        conditions = Q()
-        for name in org_names:
-            conditions |= Q(client__name__icontains=name) | Q(recipient__icontains=name)
-        
-        return Machine.objects.filter(conditions)
-    
-     # 3. Для сервисных организаций
-    if user.groups.filter(name='Сервисная организация').exists():
-        print("Доступ: сервисная организация")
-        return Machine.objects.filter(service_organization__user=user)
-    
-    # if SERVICE_GROUP in user_groups:
-    #     # Более надёжный способ определения сервисной компании
-    #     try:
-    #         service_company = ServiceOrganization.objects.get(user=user)
-    #         return Machine.objects.filter(service_company=service_company)
-    #     except ObjectDoesNotExist:
-    #         return Machine.objects.none()
-    
-    # Для пользователей без специальных прав
-    return Machine.objects.all()[:10]
-
 def clean_organization_name(name):
     """
     Приводит название организации к единому формату для сравнения.
@@ -170,17 +94,55 @@ def clean_organization_name(name):
     # Удаляем кавычки и лишние пробелы
     name = name.replace('"', '').replace("'", "").strip()
     return ' '.join(name.split())
+
+def get_machines_for_user(user):
+    """Возвращает queryset машин в зависимости от роли пользователя."""
+    if user.is_superuser or user.groups.filter(name='Менеджер').exists():
+        print("Superuser/Manager - all machines")
+        return Machine.objects.all()
+
+    if user.groups.filter(name='Клиент').exists():
+        try:
+            client = Client.objects.get(user=user)
+            print(f"Found client: {client.name}")
+            return Machine.objects.filter(client=client)
+        except Client.DoesNotExist:
+            print(f"Client not found for user {user.username}")
+            org_name = user.first_name or user.username
+            cleaned_name = clean_organization_name(org_name)
+            print(f"Searching by org name: '{cleaned_name}'")
+            machines = Machine.objects.filter(
+                Q(client__name__icontains=cleaned_name) | 
+                Q(recipient__icontains=cleaned_name))
+            print(f"Found {machines.count()} machines by org name")
+            return machines
+
+    if user.groups.filter(name='Сервисная компания').exists():
+        try:
+            service_org = ServiceOrganization.objects.get(user=user)
+            print(f"Found service org: {service_org.name}")
+            return Machine.objects.filter(service_organization=service_org)
+        except ServiceOrganization.DoesNotExist:
+            print(f"Service org not found for user {user.username}")
+            return Machine.objects.none()
+
+    print("Regular user - returning first 10 machines")
+    return Machine.objects.all()[:10]
     
 @login_required
 def machine_list(request):
     user = request.user
-    print(f"Обработка запроса для пользователя: {user.username}")  # Логирование
+    logger.info(f"Обработка запроса для пользователя: {user.username}")
 
     # Получаем queryset с учётом прав
     machines = get_machines_for_user(user).select_related(
         'model',
         'client',
-        'service_organization'
+        'service_organization',
+        'engine_model',
+        'transmission_model',
+        'axle_model',
+        'steering_axle_model'
     ).order_by('-shipment_date')
 
     print(f"Найдено машин: {machines.count()}")  # Логирование
@@ -198,33 +160,47 @@ def machine_list(request):
     except EmptyPage:
         page_obj = paginator.get_page(1)
 
+        # Получаем все справочные данные
+    references = Reference.objects.all()  # Получаем все записи из справочника
+
     context = {
         'machines': page_obj,
         'filter': machine_filter,
-        'user_groups': list(user.groups.values_list('name', flat=True))
+        'user_groups': list(user.groups.values_list('name', flat=True)),
+        'references': references,  # Передаем справочные данные в контекст
     }
 
     return render(request, 'home_auth.html', context)
 
-    # Получаем queryset в зависимости от прав пользователя
-    # machines = get_machines_for_user(user).select_related('client', 'service_organization')
 
-    # # Применяем фильтр и сортировку
-    # machine_filter = MachineFilter(request.GET, queryset=machines)
-    # machines = machine_filter.qs.order_by('-shipment_date')
+@login_required
+def machine_detail(request, machine_id):
+    machine = get_object_or_404(Machine, id=machine_id)
+    
+    # Оптимизированные запросы с select_related
+    maintenances = TechnicalMaintenance.objects.filter(machine=machine)\
+        .select_related('service_type', 'service_organization')
+    
+    claims = Claim.objects.filter(machine=machine)\
+        .select_related('failure_node', 'recovery_method', 'service_company')
+    
 
-    #   # Пагинация
-    # paginator = Paginator(machines, 10)  # 10 машин на страницу
-    # page_number = request.GET.get('page')
-
-    # try:
-    #     page_obj = paginator.get_page(page_number)
-    # except EmptyPage:
-    #     page_obj = paginator.get_page(paginator.num_pages)  # Redirect to last page if out of
-
-    # # Передаем данные в шаблон
-    # return render(request, 'home_auth.html', {'machines': page_obj, 'filter': machine_filter})
-
+    print(f"Количество технического обслуживания: {maintenances.count()}")
+    print(f"Количество рекламаций: {claims.count()}")
+    # Отладочный вывод
+    print(f"Maintenances for machine {machine_id}:")
+    for m in maintenances:
+        print(f"- {m.service_type} on {m.maintenance_date}")
+    
+    print(f"\nClaims for machine {machine_id}:")
+    for c in claims:
+        print(f"- {c.failure_node} on {c.rejection_date}")
+    
+    return render(request, 'machine_detail.html', {
+        'machine': machine,
+        'maintenances': maintenances,
+        'claims': claims,
+    })
 
 def machine_search(request):
     if request.method == 'POST':
@@ -418,3 +394,8 @@ def success_view(request):
 def claim_list(request):
     claims = Claim.objects.all()
     return render(request, 'claim_list.html', {'claims': claims})
+
+
+def custom_logout(request):
+    logout(request)
+    return redirect('home')

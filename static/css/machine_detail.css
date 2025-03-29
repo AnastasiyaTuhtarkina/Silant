@@ -1,0 +1,164 @@
+/* Стили для контейнера вкладок */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 20px;
+    /* Добавляем для Chrome */
+    display: block;
+    position: relative;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    background-color: #f1f1f1;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+    margin-right: 5px;
+    border-radius: 5px 5px 0 0;
+}
+
+.tab-button:hover {
+    background-color: #ddd;
+}
+
+.tab-button.active {
+    background-color: #163E6C;
+    color: white;
+}
+
+.tab-content {
+    display: none;
+    width: 100%;
+}
+
+.tab-content.active {
+    display: block;
+    /* Добавляем плавное появление */
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Общие стили для всех таблиц */
+.table {
+    width: 100%;
+    border-spacing: 0; /* Вместо border-collapse */
+    margin: 20px 0;
+    font-size: 0.9em;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.table thead tr {
+    background-color: #163E6C;
+    color: white;
+    text-align: left;
+}
+
+.table th,
+.table td {
+    border: 1px solid #ddd;
+    padding: 12px 15px;
+    /* Добавляем для Chrome */
+    box-sizing: border-box;
+}
+
+/* Перенос длинного текста в ячейках */
+.table td {
+    word-break: break-word;
+    overflow-wrap: anywhere; /* Новое свойство */
+    hyphens: auto;
+    -webkit-hyphens: auto;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid #ddd;
+}
+
+.table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.table tbody tr:last-of-type {
+    border-bottom: 2px solid #163E6C;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Контейнер для таблиц с горизонтальной прокруткой */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+/* Стили для пустых таблиц */
+.table tbody tr.empty td {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+}
+
+
+@media (max-width: 768px) {
+    .tab-button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .table th,
+    .table td {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+    
+    /* Альтернативный вид для узких экранов */
+    .table-responsive table {
+        display: block;
+        width: 100%;
+    }
+    
+    .table-responsive thead,
+    .table-responsive tbody,
+    .table-responsive th,
+    .table-responsive td,
+    .table-responsive tr {
+        display: block;
+    }
+    
+    .table-responsive thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    
+    .table-responsive tr {
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+    }
+    
+    .table-responsive td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+    }
+    
+    .table-responsive td:before {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        content: attr(data-label);
+        font-weight: bold;
+    }
+}

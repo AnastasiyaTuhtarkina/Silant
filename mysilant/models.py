@@ -128,14 +128,14 @@ class Machine(models.Model):
 
 
 class TechnicalMaintenance(models.Model):
-    machine = models.ForeignKey(Machine, on_delete=models.SET_NULL, null=True, related_name='maintenance', verbose_name='Машина')
+    machine = models.ForeignKey(Machine, on_delete=models.SET_NULL, null=True, related_name='maintenances', verbose_name='Машина')
     service_type = models.ForeignKey(Reference, on_delete=models.SET_NULL, null=True, related_name='maintenance_types', verbose_name='Вид ТО')
     maintenance_date = models.DateField(verbose_name='Дата проведения ТО')
     operating_hours = models.FloatField(verbose_name='Наработка, м/час')
     order_number = models.CharField(max_length=20, verbose_name='№ заказ-наряда')
     order_date = models.DateField(verbose_name='Дата заказ-наряда')
     content_type = models.ForeignKey(ServiceOrganization, on_delete=models.CASCADE, null=True, related_name='content_type', verbose_name='Организация, проводившая ТО')
-    service_organization = models.ForeignKey(ServiceOrganization, on_delete=models.SET_NULL, null=True, related_name='performing_services', verbose_name='Сервисная организация')
+    service_organization = models.ForeignKey(ServiceOrganization, on_delete=models.SET_NULL, null=True, related_name='performed_maintenances', verbose_name='Сервисная организация')
     
     def clean(self):
         super().clean()
@@ -179,8 +179,8 @@ class Claim(models.Model):
     recovery_date = models.DateField(null=True, blank=True, verbose_name='Дата восстановления')
     downtime_duration = models.DurationField(blank=True, null=True, verbose_name='Время простоя техники')
     
-    machine = models.ForeignKey(Machine, on_delete=models.SET_NULL, null=True, related_name='claim', verbose_name='Машина')
-    service_company = models.ForeignKey(ServiceOrganization, on_delete=models.SET_NULL, null=True, related_name='claim', verbose_name='Сервисная компания')
+    machine = models.ForeignKey(Machine, on_delete=models.SET_NULL, null=True, related_name='claims', verbose_name='Машина')
+    service_company = models.ForeignKey(ServiceOrganization, on_delete=models.SET_NULL, null=True, related_name='processed_claims', verbose_name='Сервисная компания')
 
     def save(self, *args, **kwargs):
         # Автоматический расчет времени простоя в начале сохранения

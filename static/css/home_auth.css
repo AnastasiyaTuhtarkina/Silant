@@ -1,0 +1,292 @@
+@font-face {
+    font-family: 'AstraRegular';
+    src: local('AstraRegular'),
+    url('../fonts/PT-Astra-Sans_Regular.ttf') format('truetype');
+}
+
+.font-face-astraRegular {
+    font-family: 'AstraRegular';
+    font-size: 60px;
+} 
+
+.container {
+    width: 100%;
+    display: flex;
+    margin: 0 auto; /* Центрируем контейнер */
+    justify-content: space-between; /* Распределяет элементы по всей ширине */
+    align-items: center; /* Выравнивает элементы по вертикали */
+    background: #EBE6D6;
+    padding: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+body.auth {
+    display: flex; /* Используем Flexbox */
+    justify-content: center; /* Центрируем по горизонтали */
+    align-items: center; /* Центрируем по вертикали */
+    margin: 10px; /* Убираем отступы */
+    padding: 10px;
+}
+
+.container_auth {
+    text-align: center; /* Центрируем текст внутри контейнера */
+    padding: 40px 20px;
+    border: 1px solid #ccc; /* Граница контейнера (по желанию) */
+    border-radius: 5px; /* Закругление углов (по желанию) */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тень для контейнера (по желанию) */
+    width: 1476px; /* Ширина контейнера (можно изменить) */
+}
+
+.container_auth p {
+    margin: 20px 0; /* Устанавливаем отступы сверху и снизу для каждого элемента формы */
+}
+
+body.reg {
+    display: flex; /* Используем Flexbox */
+    justify-content: center; /* Центрируем по горизонтали */
+    align-items: center; /* Центрируем по вертикали */
+    margin: 0; /* Убираем отступы */
+}
+
+.container_reg {
+    text-align: center; /* Центрируем текст внутри контейнера */
+    padding: 40px 20px; /* Увеличиваем отступы: 40px сверху и снизу, 20px слева и справа */
+    border: 1px solid #ccc; /* Граница контейнера (по желанию) */
+    border-radius: 5px; /* Закругление углов (по желанию) */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тень для контейнера (по желанию) */
+    width: 1476px; /* Ширина контейнера (можно изменить) */
+}
+
+.container_reg p {
+    margin: 20px 0; /* Устанавливаем отступы сверху и снизу для каждого элемента формы */
+}
+
+nav {
+    background-color: #FFFFFF;
+    width: 100%; /* Обеспечиваем заполнение */
+    display: flex; /* Используем flexbox для навигации */
+    justify-content: center; /* Центрируем содержимое навигации */
+}
+
+nav .btn {
+    color: #163E6C;
+}
+
+h1 {
+    font-size: 24px;
+    text-align: center; /* Центрируем заголовок */
+    width: 100%;
+}
+
+.content {
+    margin: 20px 0;
+}
+
+.search, .result {
+    margin: 20px 0;
+    padding: 15px;
+    background: #e9e9e9;
+    border: 1px solid #ccc;
+}
+
+.tab-container, p {
+    display: flex; /* Используем Flexbox */
+    justify-content: center; /* Центрируем кнопки по горизонтали */
+    margin-top: 20px; /* Отступ сверху для визуального разделения */
+}
+
+/* Стили для вкладок */
+.tab-button {
+    margin: 0 10px; /* Отступы между кнопками */
+    padding: 10px 20px; /* Внутренние отступы для кнопок */
+    cursor: pointer; /* Указатель при наведении */
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    display: inline-block;
+    width: 150px; /* Фиксированная ширина */
+    text-align: center; /* Выравнивание текста по центру */
+}
+.tab-button.active {
+    background-color: #163E6C;
+    color: white;
+}
+.tab {
+    display: none; /* По умолчанию все вкладки скрыты */
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-top: 10px;
+}
+
+
+.table {
+    width: 100%; /* Устанавливаем ширину в 100% */
+    table-layout: auto; /* Позволяет столбцам изменяться в зависимости от содержимого */
+    border-collapse: collapse; /* Для удаления двойных границ */
+    font-size: 9px; /* Установка размера шрифта для таблицы */
+}
+
+.tab-content {
+    width: 100%; /* Устанавливаем ширину в 100% */
+}
+
+th, td {
+    padding: 5px; /* Отступы внутри ячеек */
+    border: 1px solid #ccc; /* Граница ячеек */
+    text-align: center; /* Центрируем текст в ячейках */
+    overflow-wrap: break-word; /* Позволяет переносить длинные слова и слоги */
+    word-wrap: break-word; /* Для совместимости с более старыми браузерами */
+}
+
+th {
+    font-size: 10px; /* Размер шрифта для заголовков */
+}
+
+td {
+    font-size: 9px; /* Размер шрифта для ячеек данных */
+}
+
+table.dataTable thead th select {
+    width: 100%; /* Устанавливаем ширину выпадающего списка на 100% */
+    box-sizing: border-box; /* Учитываем отступы и границы в ширине */
+}
+
+/* Контейнер таблицы с горизонтальной прокруткой */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin: 10px 0;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 5px;
+}
+
+/* Стили DataTables */
+#machineTable {
+    width: 100% !important;
+    margin: 0 auto;
+    font-family: 'AstraRegular', sans-serif;
+}
+
+/* Стили для заголовков таблицы с переносами */
+#machineTable thead th {
+    white-space: normal !important;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    
+    /* Поддержка переноса по слогам для всех браузеров */
+    -webkit-hyphens: auto; /* Safari 5.1+, iOS 4.2+ */
+    -moz-hyphens: auto;    /* Firefox 6+ */
+    -ms-hyphens: auto;     /* Edge 12+ */
+    hyphens: auto;         /* Стандартное свойство */
+    
+    text-align: center;
+    padding: 12px 8px;
+    background-color: #163E6C;
+    color: white;
+    font-size: 10px;
+    line-height: 1.3;
+}
+
+/* Ячейки таблицы */
+#machineTable tbody td {
+    font-size: 9px;
+    padding: 10px 8px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* Полосы в таблице */
+#machineTable tbody tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
+
+/* Эффект при наведении */
+#machineTable tbody tr:hover {
+    background-color: #f0f0f0;
+}
+
+/* Стили для пагинации */
+.dataTables_wrapper .dataTables_paginate {
+    margin-top: 20px;
+}
+
+/* Стили для модального окна */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    animation: fadeIn 0.3s;
+}
+
+.modal-content {
+    background-color: #EBE6D6;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 8px;
+    width: 50%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.modal-description {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    color: #333;
+}
+
+/* Анимация появления */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+    #machineTable thead th {
+        /* Уменьшаем размер шрифта для мобильных */
+        font-size: 9px;
+        
+        /* Альтернативный перенос для старых браузеров */
+        word-break: break-all;
+        
+        /* Уменьшаем отступы */
+        padding: 8px 4px;
+    }
+
+    .modal-content {
+        width: 90%;
+        margin: 20% auto;
+    }
+
+    .table {
+        display: block; /* Делаем таблицу блочным элементом */
+        overflow-x: auto; /* Добавляем горизонтальную прокрутку на маленьких экранах */
+        white-space: nowrap; /* Запрещаем перенос строк */
+    }
+
+    th, td {
+        min-width: 100px; /* Минимальная ширина ячеек для лучшего отображения */
+    }
+}

@@ -1,5 +1,12 @@
 {% extends 'index.html' %}
 
+{% load static %} 
+
+{% block extra_css %}
+    {{ block.super }}
+    <link href="{% static 'css/home_auth.css' %}" rel="stylesheet">
+{% endblock extra_css %}
+
 {% block content %}
 <h1>
     {% if user.groups.all %}
@@ -43,32 +50,47 @@
                     <th>Дата отгузки с завода</th>
                     <th>Покупатель</th>
                     <th>Грузополучатель (конечный потребитель)</th>
-                    <th>Адрем поставки (эксплуатации)</th>
+                    <th>Адреc поставки (эксплуатации)</th>
                     <th>Комплектация (доп.опции)</th>
                     <th>Сервисная компания</th>
                 </tr>
             </thead>
             <tbody>
                 {% for machine in page_obj %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td> <!-- Автоматическая нумерация -->
-                        <td>{{ machine.model }}</td>
-                        <td>{{ machine.serial_number }}</td>
-                        <td>{{ machine.engine_model }}</td>
-                        <td>{{ machine.engine_serial_number }}</td>
-                        <td>{{ machine.transmission_model }}</td>
-                        <td>{{ machine.transmission_serial_number }}</td>
-                        <td>{{ machine.axle_model }}</td>
-                        <td>{{ machine.axle_serial_number }}</td>
-                        <td>{{ machine.steering_axle_model }}</td>
-                        <td>{{ machine.steering_axle_serial_number }}</td>
-                        <td>{{ machine.shipment_date }}</td>
-                        <td>{{ machine.client }}</td>
-                        <td>{{ machine.recipient }}</td>
-                        <td>{{ machine.delivery_address }}</td>
-                        <td>{{ machine.configuration }}</td>
-                        <td>{{ machine.service_company }}</td>
-                    </tr>
+                <tr data-id="{{ machine.id }}"> <!-- Уникальный идентификатор машины -->
+                    <td class="clickable-row">{{ forloop.counter }}</td> <!-- Номер строки -->
+                    <td class="clickable-description" data-name="{{ machine.model.name }}" 
+                        data-description="{{ machine.model.description }}">
+                        {{ machine.model }}
+                    </td>
+                    <td>{{ machine.serial_number }}</td>
+                    <td class="clickable-description" data-name="{{ machine.engine_model.name }}" 
+                        data-description="{{ machine.engine_model.description }}">
+                        {{ machine.engine_model }}
+                    </td>
+                    <td>{{ machine.engine_serial_number }}</td>
+                    <td class="clickable-description" data-name="{{ machine.transmission_model.name }}" 
+                        data-description="{{ machine.transmission_model.description }}">
+                        {{ machine.transmission_model }}
+                    </td>
+                    <td>{{ machine.transmission_serial_number }}</td>
+                    <td class="clickable-description" data-name="{{ machine.axle_model.name }}" 
+                        data-description="{{ machine.axle_model.description }}">
+                        {{ machine.axle_model }}
+                    </td>
+                    <td>{{ machine.axle_serial_number }}</td>
+                    <td class="clickable-description" data-name="{{ machine.steering_axle_model.name }}" 
+                        data-description="{{ machine.steering_axle_model.description }}">
+                        {{ machine.steering_axle_model }}
+                    </td>
+                    <td>{{ machine.steering_axle_serial_number }}</td>
+                    <td>{{ machine.shipment_date }}</td>
+                    <td>{{ machine.client }}</td>
+                    <td>{{ machine.recipient }}</td>
+                    <td>{{ machine.delivery_address }}</td>
+                    <td>{{ machine.configuration }}</td>
+                    <td>{{ machine.service_company }}</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -89,7 +111,7 @@
                 </tr>
             </thead>
             <tbody>
-            {% for maintenance in page_obj %}
+            {% for maintenance in maintenances %}
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ maintenance.machine.name }}</td>
@@ -147,7 +169,28 @@
             </tbody>
         </table>
     </div>
-    
+ <!-- Модальное окно --> 
+ <div id="modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeModal()">×</span>
+        <h3 id="modal-title"></h3>
+        Описание:
+        <div id="modal-description" class="modal-description"></div> <!-- Добавьте класс здесь -->
+    </div>
+</div>
+      
+  
+<!-- Модальное окно для деталей машины -->
+<div id="machine-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeModal()">×</span>
+        <div id="machine-modal-content"></div>
+    </div>
+</div>
+
+<script>
+    var languageUrl = "{% static 'js/ru.json' %}"; // Передаем URL в переменную
+</script>    
     <!-- Подключение jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 

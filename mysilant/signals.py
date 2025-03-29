@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.db import IntegrityError
 from .models import Client, ServiceOrganization, Manager
 import logging
@@ -51,3 +51,8 @@ def add_manager_to_group(sender, instance, created, **kwargs):
                 logger.warning(f"Manager instance (ID: {instance.id}) has no associated user.")
         except IntegrityError as e:
             logger.error(f"Error adding user to group 'Менеджер': {e}")
+
+@receiver(post_save, sender=User)
+def create_client_for_user(sender, instance, created, **kwargs):
+    if created and instance.groups.filter(name='Клиент').exists():
+        Client.objects.get_or_create(user=instance, defaults={'name': instance.first_name})       

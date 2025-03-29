@@ -1,0 +1,90 @@
+@font-face {
+    font-family: 'AstraRegular';
+    src: local('AstraRegular'),
+    url('../fonts/PT-Astra-Sans_Regular.ttf') format('truetype');
+}
+
+/* Основные стили */
+.centered-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Контейнер таблицы с горизонтальной прокруткой */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin: 10px 0;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border-radius: 5px;
+}
+
+/* Стили DataTables */
+#machineTable {
+    width: 100% !important;
+    margin: 0 auto;
+    font-family: 'AstraRegular', sans-serif;
+}
+
+/* Стили для заголовков таблицы с переносами */
+#machineTable thead th {
+    white-space: normal !important;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    
+    /* Поддержка переноса по слогам для всех браузеров */
+    -webkit-hyphens: auto; /* Safari 5.1+, iOS 4.2+ */
+    -moz-hyphens: auto;    /* Firefox 6+ */
+    -ms-hyphens: auto;     /* Edge 12+ */
+    hyphens: auto;         /* Стандартное свойство */
+    
+    text-align: center;
+    padding: 12px 8px;
+    background-color: #163E6C;
+    color: white;
+    font-size: 10px;
+    line-height: 1.3;
+}
+
+/* Ячейки таблицы */
+#machineTable tbody td {
+    font-size: 9px;
+    padding: 10px 8px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* Полосы в таблице */
+#machineTable tbody tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
+
+/* Эффект при наведении */
+#machineTable tbody tr:hover {
+    background-color: #f0f0f0;
+}
+
+/* Стили для пагинации */
+.dataTables_wrapper .dataTables_paginate {
+    margin-top: 20px;
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+    #machineTable thead th {
+        /* Уменьшаем размер шрифта для мобильных */
+        font-size: 9px;
+        
+        /* Альтернативный перенос для старых браузеров */
+        word-break: break-all;
+        
+        /* Уменьшаем отступы */
+        padding: 8px 4px;
+    }
+}
