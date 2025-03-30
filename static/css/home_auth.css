@@ -160,14 +160,14 @@ table.dataTable thead th select {
 }
 
 /* Стили DataTables */
-#machineTable {
+#machineTable, #maintenanceTable, #claimTable {
     width: 100% !important;
     margin: 0 auto;
     font-family: 'AstraRegular', sans-serif;
 }
 
 /* Стили для заголовков таблицы с переносами */
-#machineTable thead th {
+#machineTable thead th, #maintenanceTable thead th, #claimTable thead th {
     white-space: normal !important;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -188,7 +188,7 @@ table.dataTable thead th select {
 }
 
 /* Ячейки таблицы */
-#machineTable tbody td {
+#machineTable tbody td, #maintenanceTable tbody td, #claimTable tbody td{
     font-size: 9px;
     padding: 10px 8px;
     border-bottom: 1px solid #e0e0e0;
@@ -198,9 +198,63 @@ table.dataTable thead th select {
 #machineTable tbody tr:nth-child(even) {
     background-color: #f8f8f8;
 }
+#maintenanceTable tbody tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
+#claimTable tbody tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
 
 /* Эффект при наведении */
 #machineTable tbody tr:hover {
+    background-color: #f0f0f0;
+}
+
+/* Стили для пагинации */
+.dataTables_wrapper .dataTables_paginate {
+    margin-top: 20px;
+}
+
+/* Стили DataTables */
+.dataTable {
+    width: 100% !important;
+    margin: 0 auto;
+    font-family: 'AstraRegular', sans-serif;
+}
+
+/* Стили для заголовков таблицы с переносами */
+.dataTable thead th {
+    white-space: normal !important;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    
+    /* Поддержка переноса по слогам для всех браузеров */
+    -webkit-hyphens: auto; /* Safari 5.1+, iOS 4.2+ */
+    -moz-hyphens: auto;    /* Firefox 6+ */
+    -ms-hyphens: auto;     /* Edge 12+ */
+    hyphens: auto;         /* Стандартное свойство */
+    
+    text-align: center;
+    padding: 12px 8px;
+    font-size: 10px;
+    line-height: 1.3;
+}
+
+/* Ячейки таблицы */
+.dataTable tbody td {
+    font-size: 9px;
+    padding: 10px 8px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* Полосы в таблице */
+.dataTable tbody tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
+
+/* Эффект при наведении */
+.dataTable tbody tr:hover {
     background-color: #f0f0f0;
 }
 
@@ -289,4 +343,8 @@ table.dataTable thead th select {
     th, td {
         min-width: 100px; /* Минимальная ширина ячеек для лучшего отображения */
     }
-}
+
+    .dataTable {
+        font-size: 8px;
+    }
+}    

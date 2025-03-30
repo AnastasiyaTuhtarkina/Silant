@@ -8,8 +8,10 @@
 {% endblock extra_css %}
 
 {% block content %}
+
+<h1>Машина {{ machine.model }} {{ machine.serial_number }}</h1>
 <div class="tab-container">
-    <button class="tab-button" onclick="openTab(event, 'machineTab')">Общая Информация</button>
+    <button class="tab-button" onclick="openTab(event, 'machineTab')">Технические данные</button>
     <button class="tab-button active" onclick="openTab(event, 'maintenanceTab')">Техническое обслуживание</button>
     <button class="tab-button" onclick="openTab(event, 'claimsTab')">Рекламации</button>
 </div>
@@ -20,8 +22,6 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Модель техники</th>
-                <th>Зав.№ машины</th>
                 <th>Модель двигателя</th>
                 <th>Зав.№ двигателя</th>
                 <th>Модель трансмиссии (производитель, артикул)</th>
@@ -40,8 +40,6 @@
         </thead>
         <tbody>
             <tr>
-                    <td>{{ machine.model }}</td>
-                    <td>{{ machine.serial_number }}</td>
                     <td>{{ machine.engine_model }}</td>
                     <td>{{ machine.engine_serial_number }}</td>
                     <td>{{ machine.transmission_model }}</td>
@@ -59,6 +57,8 @@
             </tr>
         </tbody>
         </table>
+    </div>   
+</div>     
 
 <div id="maintenanceTab" class="tab-content active" style="display: block;">
     <h2>Техническое обслуживание</h2>
@@ -80,7 +80,7 @@
             {% for maintenance in maintenances %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ maintenance.machine.name }}</td>
+                <td>{{ maintenance.machine.serial_number }}</td>
                 <td>{{ maintenance.service_type.name }}</td>
                 <td>{{ maintenance.maintenance_date }}</td>
                 <td>{{ maintenance.operating_hours }}</td>
@@ -95,6 +95,7 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
 </div>
 
 <div id="claimsTab" class="tab-content" style="display: none;">
@@ -119,7 +120,7 @@
             {% for claim in claims %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ claim.machine.name }}</td>
+                <td>{{ claim.machine.serial_number }}</td>
                 <td>{{ claim.rejection_date }}</td>
                 <td>{{ claim.operating_hours }}</td>
                 <td>{{ claim.failure_node.name }}</td>
@@ -136,6 +137,7 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
 </div>
 
 <script>

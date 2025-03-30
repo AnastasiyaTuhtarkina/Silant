@@ -1,45 +1,49 @@
 $(document).ready(function () {
-  var table = $("#machineTable").DataTable({
-    paging: true,
-    searching: true,
-    ordering: true,
-    info: true,
-    pageLength: 10,
-    language: {
-      url: languageUrl, // Используем переменную, переданную из шаблона
-    },
-    initComplete: function () {
-      // Указываем индексы столбцов, которые должны иметь фильтры
-      var columnsWithFilters = [1, 3, 5, 7, 9]; // Индексы столбцов (начиная с 0)
+  $(".dataTable").each(function () {
+    var table = $(this).DataTable({
+      paging: true,
+      searching: true,
+      ordering: true,
+      info: true,
+      pageLength: 10,
+      language: {
+        url: languageUrl, // Используем переменную, переданную из шаблона
+      },
+      initComplete: function () {
+        // Получаем индексы столбцов из атрибута data-filter-columns
+        var columnsWithFilters = $(this)
+          .data("filter-columns")
+          .split(",")
+          .map(Number); // Преобразуем в массив чисел
 
-      // Добавляем выпадающие списки только для указанных столбцов
-      this.api()
-        .columns(columnsWithFilters)
-        .every(function () {
-          var column = this;
-          var header = $(column.header());
-          var select = $('<select><option value="">Все</option></select>')
-            .appendTo(header) // Добавляем в заголовок столбца
-            .on("change", function () {
-              var value = $(this).val();
-              column.search(value).draw(); // Применяем фильтр
-            });
+        // Добавляем выпадающие списки только для указанных столбцов
+        this.api()
+          .columns(columnsWithFilters)
+          .every(function () {
+            var column = this;
+            var header = $(column.header());
+            var select = $('<select><option value="">Все</option></select>')
+              .appendTo(header) // Добавляем в заголовок столбца
+              .on("change", function () {
+                var value = $(this).val();
+                column.search(value).draw(); // Применяем фильтр
+              });
 
-          // Заполняем выпадающий список уникальными значениями из столбца
-          column
-            .data()
-            .unique()
-            .sort()
-            .each(function (value) {
-              select.append(
-                '<option value="' + value + '">' + value + "</option>"
-              );
-            });
-        });
-    },
+            // Заполняем выпадающий список уникальными значениями из столбца
+            column
+              .data()
+              .unique()
+              .sort()
+              .each(function (value) {
+                select.append(
+                  '<option value="' + value + '">' + value + "</option>"
+                );
+              });
+          });
+      },
+    });
   });
 });
-
 // Функция для переключения вкладок
 function openTab(evt, tabName) {
   // Скрываем все вкладки
