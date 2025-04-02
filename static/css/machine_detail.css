@@ -2,9 +2,8 @@
 .table-container {
     width: 100%;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    -webkit-overflow-scrolling: touch; /* Для плавной прокрутки на iOS */
     margin-bottom: 20px;
-    /* Добавляем для Chrome */
     display: block;
     position: relative;
 }
@@ -15,7 +14,7 @@
     border: none;
     cursor: pointer;
     transition: background-color 0.3s;
-    font-size: 14px;
+    font-size: 0.875rem; /* 14px в rem */
     margin-right: 5px;
     border-radius: 5px 5px 0 0;
 }
@@ -50,8 +49,8 @@
     width: 100%;
     border-spacing: 0; /* Вместо border-collapse */
     margin: 20px 0;
-    font-size: 0.9em;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    font-size: 0.9em; /* Используйте относительные единицы */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .table thead tr {
@@ -64,8 +63,7 @@
 .table td {
     border: 1px solid #ddd;
     padding: 12px 15px;
-    /* Добавляем для Chrome */
-    box-sizing: border-box;
+    box-sizing: border-box; /* Добавляем для Chrome */
 }
 
 /* Перенос длинного текста в ячейках */
@@ -92,13 +90,6 @@
     background-color: #f1f1f1;
 }
 
-/* Контейнер для таблиц с горизонтальной прокруткой */
-.table-container {
-    width: 100%;
-    overflow-x: auto;
-    margin-bottom: 20px;
-}
-
 /* Стили для пустых таблиц */
 .table tbody tr.empty td {
     text-align: center;
@@ -106,21 +97,21 @@
     padding: 20px;
 }
 
-
+/* Адаптация для мобильных */
 @media (max-width: 768px) {
     .tab-button {
         padding: 8px 12px;
-        font-size: 12px;
+        font-size: 0.75rem; /* 12px в rem */
     }
     
     .table th,
     .table td {
         padding: 8px 10px;
-        font-size: 12px;
+        font-size: 0.75rem; /* 12px в rem */
     }
     
     /* Альтернативный вид для узких экранов */
-    .table-responsive table {
+    .table-responsive {
         display: block;
         width: 100%;
     }

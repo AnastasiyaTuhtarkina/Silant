@@ -1,0 +1,27 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <h1>{{ title }}</h1>
+    {% for entity_name, references in grouped_references.items %}
+        <h2>{{ entity_name }}</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reference in references %}
+                    <tr>
+                        <td>{{ reference.name }}</td>
+                        <td>
+                            <a href="{% url 'admin:app_reference_change' reference.id %}">Изменить</a>
+                            <a href="{% url 'admin:app_reference_delete' reference.id %}">Удалить</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+{% endblock %}

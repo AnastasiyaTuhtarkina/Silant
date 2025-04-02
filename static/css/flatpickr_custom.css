@@ -1,3 +1,6 @@
+css
+Run
+Copy code
 /* Основной цвет фона календаря */
 .flatpickr-calendar {
     background: #EBE6D6;  /* Серый фон */
@@ -13,20 +16,20 @@
 
 /* Цвет выбранной даты */
 .flatpickr-calendar .flatpickr-day.selected {
-    background: #D20A11;  /* Синий фон */
-    border-color: #000000;  /* Синяя рамка */
-    color: #EBE6D6;  /* Белый текст */
+    background: #D20A11;  /* Красный фон */
+    border-color: #000000;  /* Чёрная рамка */
+    color: #EBE6D6;  /* Светлый текст */
 }
 
 /* Цвет при наведении на дату */
 .flatpickr-calendar .flatpickr-day:hover {
     background: #163E6C;  /* Тёмно-синий фон */
-    color: #EBE6D6;  /* Белый текст */
+    color: #EBE6D6;  /* Светлый текст */
 }
 
 /* Цвет текущей даты */
 .flatpickr-calendar .flatpickr-day.today {
-    border-color: #000000;  /* Синяя рамка */
+    border-color: #000000;  /* Чёрная рамка */
 }
 
 /* Цвет отключённых дат */

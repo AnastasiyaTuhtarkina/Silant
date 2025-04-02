@@ -16,8 +16,28 @@ class EntityAdmin(admin.ModelAdmin):
 
 @admin.register(Reference)
 class ReferenceAdmin(admin.ModelAdmin):
-    list_display = ['entity', 'name']
+    list_display = ['name', 'entity']
     search_fields = ['name']
+    list_filter = ['entity']
+
+    def get_grouped_queryset(self, request):
+        qs = self.get_queryset(request)
+        grouped = {}
+        for reference in qs:
+            entity_name = reference.entity.name if reference.entity else 'Без сущности'
+            if entity_name not in grouped:
+                grouped[entity_name] = []
+            grouped[entity_name].append(reference)
+        return grouped
+
+    def changelist_view(self, request, extra_context=None):
+        grouped_references = self.get_grouped_queryset(request)
+        extra_context = extra_context or {}
+        extra_context['grouped_references'] = grouped_references
+        return super().changelist_view(request, extra_context=extra_context)
+
+    def get_template_names(self):
+        return ['admin/grouped_reference_list.html']
 
 @admin.register(ServiceOrganization)
 class ServiceOrganizationAdmin(admin.ModelAdmin):

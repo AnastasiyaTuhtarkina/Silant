@@ -6,25 +6,31 @@ from functools import wraps
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.core.mail import send_mail
 from django.core.paginator import Paginator, EmptyPage
 from django.db.models import Q
 from django.http import JsonResponse
 from django.urls import reverse
-from django.utils.decorators import method_decorator
-from django.views.generic import UpdateView
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework import generics
+
 
 # Локальные импорты
 from .filters import MachineFilter, MaintenanceFilter, ClaimFilter
 from .models import Machine, TechnicalMaintenance, Claim, Reference, Client, ServiceOrganization
 from .forms import *
+from .serializers import *
 
 
 logger = logging.getLogger(__name__)
 def home(request):
     search_query = request.GET.get('search', '')
+
+    is_manager = request.user.groups.filter(name='Менеджер').exists()
+    is_service_organization = request.user.groups.filter(name='Сервисная организация').exists()
     
     # Фильтрация машин по пользователю (если авторизован)
     if request.user.is_authenticated:
@@ -47,7 +53,9 @@ def home(request):
             'page_obj': page_obj ,
             'maintenances': maintenances,  # Переименовано для соответствия шаблону
             'claims': claims,              # Переименовано для соответствия шаблону
-            'user_groups': list(request.user.groups.values_list('name', flat=True))
+            'user_groups': list(request.user.groups.values_list('name', flat=True)),
+            'is_manager': is_manager,
+            'is_service_organization': is_service_organization,
         }
         return render(request, 'home_auth.html', context)
     
@@ -203,6 +211,81 @@ def machine_detail(request, machine_id):
         'claims': claims,
     })
 
+@login_required
+def add_machine(request):
+    if request.method == 'POST':
+        form = MachineForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')  # Перенаправление на главную страницу или список машин
+    else:
+        form = MachineForm()
+    
+    # Получаем все значения для справочников
+    references = Reference.objects.all()
+    clients = Client.objects.all()
+    service_companies = ServiceOrganization.objects.all()
+
+    return render(request, 'add_machine.html', {
+        'form': form,
+        'references': references,
+        'clients': clients,
+        'service_companies': service_companies,
+    })
+
+@csrf_exempt
+@require_POST
+def add_reference(request):
+    entity_name = request.POST.get('entity')
+    reference_name = request.POST.get('name')
+    
+    if not entity_name or not reference_name:
+        return JsonResponse({'error': 'Не указана сущность или название'}, status=400)
+    
+    try:
+        entity = Entity.objects.get(name=entity_name)
+        reference = Reference.objects.create(
+            entity=entity,
+            name=reference_name,
+            description=f"Автоматически создано из формы"
+        )
+        return JsonResponse({
+            'id': reference.id,
+            'name': reference.name,
+            'text': reference.name  # Для Select2
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+    
+@login_required
+def add_maintenance(request):
+    if request.method == 'POST':
+        form = MaintenanceForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('home') + '#tab2')
+    else:
+        form = MaintenanceForm()
+
+    return render(request, 'add_maintenance.html', {
+        'form': form,
+    })   
+
+@login_required
+def add_claim(request):
+    if request.method == 'POST':
+        form = ClaimForm(request.POST)
+        if form.is_valid():
+            form.save()
+             # Перенаправляем на главную с параметром активной вкладки
+            return redirect(reverse('home') + '#tab3')
+    else:
+        form = ClaimForm()
+
+    return render(request, 'add_claim.html', {
+        'form': form,
+    })   
+
 @role_required('Менеджер')
 def edit_reference(request):
     if request.method == 'POST':
@@ -220,44 +303,6 @@ def edit_reference(request):
 
     return render(request, 'edit_reference.html', {'form': form})
 
-@method_decorator(role_required('Менеджер'), name='dispatch')
-class MachineUpdateView(UpdateView):
-    model = Machine
-    fields = ['serial_number', 'model', 'engine_model', 'shipment_date']
-    template_name = 'machine_edit.html'
-    # success_url = reverse('machine_list')
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.groups.filter(name='Менеджер').exists():
-            raise PermissionDenied("У вас нет прав для редактирования этой машины.")
-        return super().dispatch(request, *args, **kwargs)
-
-
-class TechnicalMaintenanceUpdateView(UpdateView):
-    model = TechnicalMaintenance
-    fields = ['machine', 'service_type', 'maintenance_date', 'operating_hours']
-    template_name = 'technical_maintenance_edit.html'
-    # success_url = '/technical_maintenances/'
-
-    def dispatch(self, request, *args, **kwargs):
-        # Проверяем, что пользователь является менеджером или сервисной организацией
-        if not (request.user.groups.filter(name='Менеджер').exists() or
-                request.user.groups.filter(name='Сервисная организация').exists()):
-            raise PermissionDenied("У вас нет прав для редактирования этого ТО.")
-        return super().dispatch(request, *args, **kwargs)
-    
-class ClaimUpdateView(UpdateView):
-    model = Claim
-    fields = ['machine', 'rejection_date', 'operating_hours', 'failure_node', 'recovery_method']
-    template_name = 'claim_edit.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        # Проверяем, что пользователь является менеджером или сервисной организацией
-        if not (request.user.groups.filter(name='Менеджер').exists() or
-                request.user.groups.filter(name='Сервисная организация').exists()):
-            raise PermissionDenied("У вас нет прав для редактирования этой рекламации.")
-        return super().dispatch(request, *args, **kwargs)
-    
 def reference_view(request):
     if request.method == 'POST':
         form = ReferenceForm(request.POST)
@@ -324,3 +369,19 @@ def claim_list(request):
 def custom_logout(request):
     logout(request)
     return redirect('home')
+
+
+class MachineList(generics.ListAPIView):
+    queryset = Machine.objects.all()
+    serializer_class = MachineSerializer
+
+class MaintenanceList(generics.ListAPIView):
+    queryset = TechnicalMaintenance.objects.all()
+    serializer_class = MaintenanceSerializer
+
+class ClaimList(generics.ListAPIView):
+    queryset = Claim.objects.all()
+    serializer_class = ClaimSerializer
+
+def api_page(request):
+    return render(request, 'api_page.html')  # Укажите имя вашего шаблона

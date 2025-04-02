@@ -92,8 +92,17 @@
                     <td>{{ machine.service_company }}</td>
                 </tr>
                 {% endfor %}
+                
             </tbody>
         </table>
+        {% if is_manager %}
+        <tr>
+            <td colspan="5">
+                <button onclick="location.href='{% url 'add_machine' %}'">Добавить данные</button>
+            </td>
+        </tr>
+    {% endif %}
+
     </div>
     
     <div id="tab2" class="tab tab-content">
@@ -131,6 +140,11 @@
             {% endfor %}
             </tbody>
         </table>
+        <tr>
+            <td colspan="5">
+                <button onclick="location.href='{% url 'add_maintenance' %}'">Добавить данные</button>
+            </td>
+        </tr>
     </div>
     
     <div id="tab3" class="tab tab-content">
@@ -172,6 +186,15 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        {% if is_manager or is_service_organization %}
+        <tr>
+            <td colspan="5">
+                <button onclick="location.href='{% url 'add_claim' %}'">Добавить данные</button>
+            </td>
+        </tr>
+        {% endif %}
+
     </div>
  <!-- Модальное окно --> 
  <div id="modal" class="modal" style="display:none;">

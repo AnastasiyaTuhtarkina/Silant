@@ -1,0 +1,68 @@
+{% extends 'index.html' %}
+
+{% load static %} 
+
+{% block extra_css %}
+    {{ block.super }}
+    <link href="{% static 'css/add_machine.css' %}" rel="stylesheet">
+{% endblock extra_css %}
+
+{% block extra_js %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#get-machines').click(function() {
+                $.get('/api/machines/', function(data) {
+                    $('#results').text(JSON.stringify(data, null, 2));
+                }).fail(function() {
+                    $('#results').text('Ошибка при получении данных о машинах.');
+                });
+            });
+
+            $('#get-maintenance').click(function() {
+                $.get('/api/maintenances/', function(data) {
+                    $('#results').text(JSON.stringify(data, null, 2));
+                }).fail(function() {
+                    $('#results').text('Ошибка при получении данных о ТО.');
+                });
+            });
+
+            $('#get-claims').click(function() {
+                $.get('/api/claims/', function(data) {
+                    $('#results').text(JSON.stringify(data, null, 2));
+                }).fail(function() {
+                    $('#results').text('Ошибка при получении данных о рекламациях.');
+                });
+            });
+        });
+    </script>
+
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <h1 class="mt-5">Документация API</h1>
+        <p>Добро пожаловать в документацию API. Здесь вы можете найти информацию о доступных конечных точках.</p>
+
+        <h2>Доступные конечные точки</h2>
+        <ul>
+            <li>
+                <strong>GET /api/machines/</strong> - Получить список всех машин.
+                <button class="btn btn-primary btn-sm" id="get-machines">Получить данные</button>
+            </li>
+            <li>
+                <strong>GET /api/maintenances/</strong> - Получить список всех технических обслуживаний.
+                <button class="btn btn-primary btn-sm" id="get-maintenance">Получить данные</button>
+            </li>
+            <li>
+                <strong>GET /api/claims/</strong> - Получить список всех рекламаций.
+                <button class="btn btn-primary btn-sm" id="get-claims">Получить данные</button>
+            </li>
+        </ul>
+
+        <h2>Результаты:</h2>
+        <pre id="results"></pre>
+    </div>
+
+{% endblock %}

@@ -1,17 +1,18 @@
 from rest_framework import serializers
 
-from .models import Machine
+from .models import Machine, TechnicalMaintenance, Claim
 
 class MachineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Machine
-        fields = '__all__'
+        fields = '__all__'  # Или укажите конкретные поля
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        user = self.context['request'].user
-        if not user.is_authenticated:
-            # Ограничиваем поля для неавторизованных пользователей
-            allowed_fields = ['serial_number', 'model', 'engine_model', 'transmission_model', 'axle_model', 'steering_axle_model', 'shipment_date']
-            return {field: data[field] for field in allowed_fields}
-        return data
+class MaintenanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TechnicalMaintenance
+        fields = '__all__'  # Или укажите конкретные поля
+
+class ClaimSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Claim
+        fields = '__all__'  # Или укажите конкретные поля

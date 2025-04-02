@@ -1,0 +1,94 @@
+/* styles.css */
+@font-face {
+    font-family: 'AstraRegular';
+    src: local('AstraRegular'),
+    url('../fonts/PT-Astra-Sans_Regular.ttf') format('truetype');
+}
+
+.font-face-astraRegular {
+    font-family: 'AstraRegular';
+    font-size: 3.75rem; /* 60px в rem */
+} 
+
+.form-group {
+    display: flex;
+    flex-wrap: wrap; /* Разрешаем перенос элементов */
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    flex: 0 0 30%; /* Фиксированная ширина для метки */
+    margin-right: 10px;
+}
+
+.form-group select,
+.form-group input[type="text"],
+.form-group input[type="date"] {
+    flex: 1; /* Занимает оставшееся пространство */
+    min-width: 200px; /* Минимальная ширина поля */
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.add-reference-btn {
+    flex: 0 0 auto; /* Не растягивается и не сжимается */
+    padding: 8px 12px;
+    background-color: #f8f9fa; /* Цвет как у полей */
+    border: 1px solid #ced4da; /* Граница как у полей */
+    border-radius: 4px;
+    color: #495057; /* Цвет текста */
+    cursor: pointer;
+    margin-top: 5px;
+    transition: background-color 0.2s, border-color 0.2s; /* Уточнение переходов */
+}
+
+.add-reference-btn:hover {
+    background-color: #e2e6ea; /* Изменение цвета при наведении */
+    border-color: #adb5bd;
+}
+
+/* Стиль для основного поля select с кнопкой */
+.reference-field-container {
+    display: flex;
+    flex: 1;
+    min-width: 200px;
+}
+
+body {
+    font-family: 'AstraRegular', sans-serif; /* Добавление запасного шрифта */
+    margin: 0;
+    padding: 20px;
+}
+
+h2 {
+    text-align: center;
+    color: #333;
+}
+
+form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+button[type="submit"] {
+    background-color: #D20A11;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+    transition: background-color 0.3s; /* Плавный переход для фона */
+}
+
+button[type="submit"]:hover {
+    background-color: #163E6C;
+}

@@ -186,7 +186,8 @@ class Claim(models.Model):
         # Автоматический расчет времени простоя в начале сохранения
         if self.recovery_date and self.rejection_date:
             downtime = self.recovery_date - self.rejection_date
-            self.downtime_duration = downtime
+            # Присваиваем значение как timedelta
+            self.downtime_duration = downtime  # Время в timedelta
         super().save(*args, **kwargs)
 
     def clean(self):

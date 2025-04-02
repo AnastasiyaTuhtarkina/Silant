@@ -12,7 +12,7 @@
     {% block extra_css %}{% endblock %}
     {% block extra_js %}{% endblock %}
 </head>
-<body>
+<body class="index">
     <div class="wrapper">
         <!-- Header -->
         <header class="shadow-sm">
@@ -28,9 +28,13 @@
                     </div>
                     <div class="col-md-3 text-end">
                         {% if user.is_authenticated %}
-                            <a href="{% url 'logout' %}" class="btn btn-danger">Выйти</a>
+                            <a href="{% url 'logout' %}" class="btn custom-api-button">Выйти</a>
                         {% else %}
-                            <a href="{% url 'auth_view' %}" class="btn btn-primary">Авторизация</a>
+                            <a href="{% url 'auth_view' %}" class="btn custom-api-button">Авторизация</a>
+                        {% endif %}
+
+                        {% if user.is_superuser or is_manager %}
+                            <a href="{% url 'admin:index' %}" class="btn custom-api-button">Перейти в админ-панель</a>
                         {% endif %}
                     </div>
                 </div>
@@ -53,16 +57,22 @@
         <footer class="py-3 mt-auto">
             <div class="container">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4 mb-3">
                         <h4 class="fs-5">О нас</h4>
                         <p class="mb-0">Мы предоставляем услуги по сервисному обслуживанию машин Силант.</p>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4 mb-3">
                         <h4 class="fs-5">Контакты</h4>
                         <p class="mb-0">
                             +7-8352-20-12-09, telegram<br>
                             E-mail: support@my-silant.ru<br>
                             Skype: my_silant
+                        </p>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <h4 class="fs-5">API</h4>
+                        <p>
+                            <a href="/api/" class="btn custom-api-button">Перейти к API</a>
                         </p>
                     </div>
                 </div>

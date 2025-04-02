@@ -1,0 +1,80 @@
+{% extends 'index.html' %}
+
+{% load static %} 
+
+{% block extra_css %}
+    {{ block.super }}
+    <link href="{% static 'css/add_machine.css' %}" rel="stylesheet">
+{% endblock extra_css %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Только для полей со справочниками (имеющих класс reference-select)
+    document.querySelectorAll('.reference-select').forEach(select => {
+        const container = select.closest('.form-group');
+        
+        // Создаем кнопку только если её ещё нет
+        if (!container.querySelector('.add-reference-btn')) {
+            const addButton = document.createElement('button');
+            addButton.type = 'button';
+            addButton.className = 'add-reference-btn';
+            addButton.textContent = '+ Добавить значение';
+            addButton.dataset.entity = select.dataset.entity;
+            addButton.dataset.url = select.dataset.url;
+            
+            addButton.addEventListener('click', function() {
+                const entity = this.dataset.entity;
+                const newValue = prompt(`Введите новое значение для "${entity}":`);
+                
+                if (newValue) {
+                    fetch(this.dataset.url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `entity=${encodeURIComponent(entity)}&name=${encodeURIComponent(newValue)}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert('Ошибка: ' + data.error);
+                        } else {
+                            const option = new Option(data.name, data.id, true, true);
+                            select.appendChild(option);
+                        }
+                    })
+                    .catch(error => {
+                        alert('Ошибка при сохранении: ' + error);
+                    });
+                }
+            });
+            
+            // Добавляем кнопку после поля ввода
+            container.appendChild(addButton);
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<h2>Добавить ТО</h2>
+<form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="form-group">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.help_text %}
+                <small class="form-text text-muted">{{ field.help_text }}</small>
+            {% endif %}
+            {% if field.errors %}
+                <div class="alert alert-danger">{{ field.errors }}</div>
+            {% endif %}
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn-submit">Добавить</button>
+</form>
+{% endblock %}
